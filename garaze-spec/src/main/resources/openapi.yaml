@@ -1,0 +1,88 @@
+openapi: 3.0.0
+
+info:
+  version: 0.0.1
+  title: Garaze API
+  description: The API for Garaze - an app that let's you manage parking spots
+
+tags:
+  - name: "Garaze"
+
+paths:
+  /parking-spots:
+    get:
+      summary: This is summary
+      tags:
+        - "Garaze"
+      description: This is a description
+      operationId: getAllParkingSpots
+      responses:
+        200:
+          description: This means its ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParkingSpot'
+
+  /user/by-spot-id/{spot_id}:
+    get:
+      summary: This is summary
+      tags:
+        - "Garaze"
+      description: This is a description
+      operationId: getUserBySpotId
+      parameters:
+        - name: spot_id
+          in: path
+          required: true
+          description: The id of the parking spot
+          schema:
+            type: string
+      responses:
+        200:
+          description: This means its ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+components:
+  schemas:
+    ParkingSpot:
+      description: This is the parking spot model
+      type: object
+      properties:
+        name:
+          description: The name of parking spot
+          type: string
+        id:
+          description: Id of parking spot
+          type: string
+        x:
+          description: X coordinate of parking spot
+          type: number
+        y:
+          description: Y coordinate of parking spot
+          type: number
+        id_owner:
+          description: Id of owner
+          type: string
+
+    User:
+      description: This is the user model
+      type: object
+      properties:
+        name:
+          description: The name of user
+          type: string
+        id:
+          description: Id of user
+          type: string
+        email:
+          description: Email of user
+          type: string
+        profile_picture_url:
+          description: Profile picture url of user
+          type: string
