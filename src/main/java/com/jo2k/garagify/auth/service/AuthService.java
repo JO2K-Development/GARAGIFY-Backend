@@ -3,8 +3,10 @@ package com.jo2k.garagify.auth.service;
 import com.jo2k.dto.TokenDto;
 import com.jo2k.garagify.common.exception.InvalidTokenException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
+@Component
 public class AuthService {
 
     private final JwtService jwtService;
