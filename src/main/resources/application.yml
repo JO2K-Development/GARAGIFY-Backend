@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: garagify
+  docker:
+    compose:
+      enabled: false
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SERVICE_DB_URL}
+    username: ${SERVICE_DB_LOGIN}
+    password: ${SERVICE_DB_PASSWORD}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  profiles:
+    active: dev
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.poziomk3: DEBUG
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+
+jwt:
+  secret: ${JWT_SECRET}
+
+google:
+  clientId: ${GOOGLE_CLIENT_ID}
+

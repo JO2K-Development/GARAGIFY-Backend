@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: Garagify Authentication API
+  version: 1.0.0
+  description: API for Google-based authentication and token refreshing.
+
+paths:
+  /api/v1/auth/access:
+    post:
+      summary: Authenticate using a Google token
+      operationId: authenticateWithGoogle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerificationForm'
+      responses:
+        '200':
+          description: JWT tokens returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenDto'
+
+  /api/v1/auth/refresh:
+    post:
+      summary: Refresh JWT token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerificationForm'
+      responses:
+        '200':
+          description: New JWT tokens returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenDto'
+
+components:
+  schemas:
+    TokenVerificationForm:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
+
+    TokenDto:
+      type: object
+      properties:
+        access:
+          type: string
+        refresh:
+          type: string
+      required:
+        - access
+        - refresh
