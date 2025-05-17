@@ -1,12 +1,18 @@
 openapi: 3.0.3
 info:
-  title: Garagify Authentication API
+  title: Garagify
   version: 1.0.0
-  description: API for Google-based authentication and token refreshing.
+  description: API
+
+tags:
+  - name: AuthController
+    description: Handles Google token authentication and JWT refresh operations
 
 paths:
   /api/v1/auth/access:
     post:
+      tags:
+        - AuthController
       summary: Authenticate using a Google token
       operationId: authenticateWithGoogle
       requestBody:
@@ -25,6 +31,8 @@ paths:
 
   /api/v1/auth/refresh:
     post:
+      tags:
+        - AuthController
       summary: Refresh JWT token
       operationId: refreshToken
       requestBody:
