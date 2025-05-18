@@ -1,7 +1,8 @@
+#  docker network create garagify-shared-network;docker compose up;
+version: '3.8'
+
 services:
-  #  comment out server for local development
   server:
-    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,17 +16,26 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgresdb
+      - postgres
+    networks:
+      - garagify-shared-network
 
-  postgresdb:
+  postgres:
     image: postgres:16
     environment:
       POSTGRES_USER: ${SERVICE_DB_LOGIN}
       POSTGRES_PASSWORD: ${SERVICE_DB_PASSWORD}
-      POSTGRES_DB: garagify
+      POSTGRES_DB: ${SERVICE_DB_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks:
+      - garagify-shared-network
+
+networks:
+  garagify-shared-network:
+    external: true
+
 volumes:
   postgres-data:
