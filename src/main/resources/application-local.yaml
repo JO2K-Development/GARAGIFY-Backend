@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/garagify
+    username: postgres
+    password: postgres
+
+jwt:
+  secret: 3IUIRg1kXZF9DrfhuBKU0+E8IHL+3yVcGVd0aE4z5y8=
+
+google:
+  clientId: 1234567890-abcde12345.apps.googleusercontent.com
