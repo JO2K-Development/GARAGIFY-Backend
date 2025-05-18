@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
+      - SPRING_PROFILES_ACTIVE=dev
       - SERVICE_DB_URL=${SERVICE_DB_URL}
       - SERVICE_DB_LOGIN=${SERVICE_DB_LOGIN}
       - SERVICE_DB_PASSWORD=${SERVICE_DB_PASSWORD}
