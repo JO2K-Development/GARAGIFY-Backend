@@ -29,7 +29,22 @@
     <properties>
         <java.version>21</java.version>
         <lombok.version>1.18.32</lombok.version>
+
+        <springdoc.version>2.2.0</springdoc.version>
+        <swagger-parser.version>2.1.17</swagger-parser.version>
+        <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
+        <jackson.databind.nullable.version>0.2.4</jackson.databind.nullable.version>
+        <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
+        <google.api-client.version>2.7.2</google.api-client.version>
+        <google.oauth-client.version>1.34.1</google.oauth-client.version>
+        <google.http-client-gson.version>1.42.3</google.http-client-gson.version>
+        <jjwt.version>0.12.6</jjwt.version>
+        <openapi.generator.version>7.4.0</openapi.generator.version>
+        <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
+        <maven.compiler-plugin.version>3.13.0</maven.compiler-plugin.version>
+
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -94,31 +109,31 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.2.0</version>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
             <artifactId>swagger-parser</artifactId>
-            <version>2.1.17</version>
+            <version>${swagger-parser.version}</version>
         </dependency>
 
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
+            <version>${javax.annotation-api.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.4</version>
+            <version>${jackson.databind.nullable.version}</version>
         </dependency>
 
 
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
+            <version>${javax.servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -140,34 +155,34 @@
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
-            <version>2.7.2</version>
+            <version>${google.api-client.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client</artifactId>
-            <version>1.34.1</version>
+            <version>${google.oauth-client.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-gson</artifactId>
-            <version>1.42.3</version>
+            <version>${google.http-client-gson.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
-            <version>0.12.6</version>
+            <version>${jjwt.version}</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
-            <version>0.12.6</version>
+            <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
-            <version>0.12.6</version>
+            <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
@@ -180,7 +195,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.4.0</version>
+                <version>${openapi.generator.version}</version>
                 <executions>
                     <execution>
                         <id>generate-api</id>
@@ -213,7 +228,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>${build-helper-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>add-openapi-sources</id>
@@ -234,7 +249,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+
+                <version>${maven.compiler-plugin.version}</version>
                 <configuration>
                     <annotationProcessorPaths>
                         <path>
