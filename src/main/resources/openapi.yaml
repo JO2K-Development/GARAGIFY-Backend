@@ -8,6 +8,13 @@ tags:
   - name: AuthController
     description: Handles Google token authentication and JWT refresh operations
   - name: ParkingSpotsController
+  - name: OrganizationController
+    description: Handles organization-related operations, including fetching parkings and organizations by owner id
+  - name: BorrowController
+  - name: LendOfferController
+    description: Handles lend offers and borrows, including creation and retrieval by filters
+  - name: UserController
+
 paths:
   /api/v1/auth/access:
     post:
@@ -58,7 +65,7 @@ paths:
       tags:
         - ParkingSpotsController
       description: DO USTALENIA with available spots with the selected filters for the selected parking
-      operationId: getAvailableParkingSpots
+      operationId: getAvailableParkingDates
       parameters:
         - name: parking_id
           in: path
@@ -162,7 +169,7 @@ paths:
       tags:
         - ParkingSpotsController
       description: returns list of available parking spots WITHIN ONLY ONE SOLUTION for the chosen range allowing re-parking the car during the reservation, with the selected filters for the selected parking
-      operationId: getAvailableParkingSpots
+      operationId: getAvailableParkingSpotsReparked
       parameters:
         - name: parking_id
           in: path
@@ -208,7 +215,7 @@ paths:
     patch:
         summary: Patch user fields
         tags:
-            - ParkingSpotsController
+            - UserController
         description: This is a description
         operationId: updateUser
         requestBody:
@@ -252,7 +259,7 @@ paths:
     get:
       summary: Organization by id
       tags:
-        - OrganizationController
+        - UserController
       description: This is a description
       operationId: getOrganizationById
       parameters:
