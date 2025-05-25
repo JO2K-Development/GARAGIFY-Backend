@@ -14,6 +14,8 @@ spring:
   docker:
     compose:
       enabled: false
+  profile:
+    active: dev #TODO: Change to prod in production
 
 server:
   port: 8080
