@@ -621,14 +621,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InvitationRequestDto'
+              $ref: '#/components/schemas/InvitationPOST'
       responses:
         '201':
           description: Invitation sent.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationResponseDto'
+                $ref: '#/components/schemas/InvitationGET'
 
 components:
   schemas:
@@ -860,7 +860,7 @@ components:
           description: json of obstacles and the boundary
           type: string
 
-    InvitationResponseDto:
+    InvitationGET:
       type: object
       properties:
         id:
@@ -873,7 +873,7 @@ components:
           type: string
           format: date-time
 
-    InvitationRequestDto:
+    InvitationPOST:
       type: object
       required: [ email ]
       properties:
