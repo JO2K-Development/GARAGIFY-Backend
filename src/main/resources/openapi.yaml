@@ -71,7 +71,7 @@ paths:
           in: path
           required: true
           schema:
-              type: string
+            type: string
           description: The id of the parking to filter by
         - name: start_date
           in: query
@@ -127,7 +127,7 @@ paths:
           in: path
           required: true
           schema:
-              type: string
+            type: string
           description: The id of the parking to filter by
 
         - name: start_date
@@ -213,24 +213,24 @@ paths:
 
   /api/v1/user:
     patch:
-        summary: Patch user fields
-        tags:
-            - UserController
-        description: This is a description
-        operationId: updateUser
-        requestBody:
-            required: true
-            content:
-              application/json:
-                  schema:
-                    $ref: '#/components/schemas/UserPATCH'
-        responses:
-            200:
-              description: This means its ok
-              content:
-                  application/json:
-                    schema:
-                        $ref: '#/components/schemas/UserGET'
+      summary: Patch user fields
+      tags:
+        - UserController
+      description: This is a description
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPATCH'
+      responses:
+        200:
+          description: This means its ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserGET'
 
   /api/v1/user/by-spot-id/{spot_id}:
     get:
@@ -259,7 +259,7 @@ paths:
     get:
       summary: Organization by id
       tags:
-        - UserController
+        - OrganizationController
       description: This is a description
       operationId: getOrganizationById
       parameters:
@@ -378,233 +378,257 @@ paths:
 
   /api/v1/borrow:
     post:
-        summary: Borrow a parking spot
-        tags:
-            - BorrowController
-        description: This is a description
-        operationId: createBorrow
-        requestBody:
-            required: true
-            content:
-              application/json:
-                  schema:
-                    $ref: '#/components/schemas/BorrowPOST'
-        responses:
-            200:
-              description: This means its ok
-              content:
-                  application/json:
-                    schema:
-                        $ref: '#/components/schemas/BorrowGET'
+      summary: Borrow a parking spot
+      tags:
+        - BorrowController
+      description: This is a description
+      operationId: createBorrow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BorrowPOST'
+      responses:
+        200:
+          description: This means its ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BorrowGET'
 
     get:
-        summary: Borrows by filters
-        tags:
-            - BorrowController
-        description: This is a description
-        operationId: getAllBorrows
-        parameters:
-          - name: page
-            in: query
-            required: false
-            schema:
-              type: integer
-              minimum: 0
-            description: Page number (zero-based)
-          - name: size
-            in: query
-            required: false
-            schema:
-              type: integer
-              minimum: 1
-            description: Number of items per page
-          - name: start_date
-            in: query
-            required: false
-            schema:
-              type: string
-              format: date-time
-            description: Start date for the date range filter (inclusive)
-          - name: end_date
-            in: query
-            required: false
-            schema:
-              type: string
-              format: date-time
-            description: End date for the date range filter (inclusive)
-          - name: borrower_id
-            in: query
-            required: false
-            schema:
-              type: string
-            description: The id of the borrower to filter by
-
-        responses:
-            200:
-              description: This means its ok
-              content:
-                  application/json:
-                    schema:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/BorrowGET'
+      summary: Borrows by filters
+      tags:
+        - BorrowController
+      description: This is a description
+      operationId: getAllBorrows
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          description: Page number (zero-based)
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Number of items per page
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Start date for the date range filter (inclusive)
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: End date for the date range filter (inclusive)
+        - name: borrower_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: The id of the borrower to filter by
+        - name: owner_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: The id of the owner to filter by
+      responses:
+        200:
+          description: This means its ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BorrowGET'
 
   /api/v1/borrow/{borrow_id}:
     get:
-        summary: Borrow by id
-        tags:
-            - BorrowController
-        description: This is a description
-        operationId: getBorrowById
-        parameters:
-            - name: borrow_id
-              in: path
-              required: true
-              description: The id of the borrow
+      summary: Borrow by id
+      tags:
+        - BorrowController
+      description: This is a description
+      operationId: getBorrowById
+      parameters:
+        - name: borrow_id
+          in: path
+          required: true
+          description: The id of the borrow
+          schema:
+            type: string
+      responses:
+        200:
+          description: This means its ok
+          content:
+            application/json:
               schema:
-                type: string
-        responses:
-            200:
-              description: This means its ok
-              content:
-                  application/json:
-                    schema:
-                        $ref: '#/components/schemas/BorrowGET'
+                $ref: '#/components/schemas/BorrowGET'
 
 
     delete:
-        summary: Remove borrow by id
-        tags:
-            - BorrowController
-        description: This is a description
-        operationId: deleteBorrowById
-        parameters:
-            - name: borrow_id
-              in: path
-              required: true
-              description: The id of the borrow
-              schema:
-                type: string
-        responses:
-            200:
-              description: This means its ok
+      summary: Remove borrow by id
+      tags:
+        - BorrowController
+      description: This is a description
+      operationId: deleteBorrowById
+      parameters:
+        - name: borrow_id
+          in: path
+          required: true
+          description: The id of the borrow
+          schema:
+            type: string
+      responses:
+        200:
+          description: This means its ok
 
 
   /api/v1/lend-offer:
     post:
-        summary: Create a lend offer
-        tags:
-            - LendOfferController
-        description: This is a description
-        operationId: createLendOffer
-        requestBody:
-            required: true
-            content:
-              application/json:
-                  schema:
-                    $ref: '#/components/schemas/LendOfferPOST'
-        responses:
-            200:
-              description: This means its ok
-              content:
-                  application/json:
-                    schema:
-                        $ref: '#/components/schemas/LendOfferGET'
+      summary: Create a lend offer
+      tags:
+        - LendOfferController
+      description: This is a description
+      operationId: createLendOffer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LendOfferPOST'
+      responses:
+        200:
+          description: This means its ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LendOfferGET'
 
     get:
-        summary: Lend offers by filters
-        tags:
-            - LendOfferController
-        description: This is a description
-        operationId: getAllLendOffers
-        parameters:
-          - name: page
-            in: query
-            required: false
-            schema:
-              type: integer
-              minimum: 0
-            description: Page number (zero-based)
-          - name: size
-            in: query
-            required: false
-            schema:
-              type: integer
-              minimum: 1
-            description: Number of items per page
-          - name: start_date
-            in: query
-            required: false
-            schema:
-              type: string
-              format: date-time
-            description: Start date for the date range filter (inclusive)
-          - name: end_date
-            in: query
-            required: false
-            schema:
-              type: string
-              format: date-time
-            description: End date for the date range filter (inclusive)
-          - name: owner_id
-            in: query
-            required: false
-            schema:
-              type: string
-            description: The id of the owner to filter by
+      summary: Lend offers by filters
+      tags:
+        - LendOfferController
+      description: This is a description
+      operationId: getAllLendOffers
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          description: Page number (zero-based)
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Number of items per page
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Start date for the date range filter (inclusive)
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: End date for the date range filter (inclusive)
+        - name: owner_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: The id of the owner to filter by
 
-        responses:
-            200:
-              description: This means its ok
-              content:
-                  application/json:
-                    schema:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/LendOfferGET'
+
+      responses:
+        200:
+          description: This means its ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LendOfferGET'
 
 
 
   /api/v1/lend-offer/{lend_offer_id}:
     get:
-        summary: Lend offer by id
-        tags:
-            - LendOfferController
-        description: This is a description
-        operationId: getLendOfferById
-        parameters:
-            - name: lend_offer_id
-              in: path
-              required: true
-              description: The id of the lend offer
+      summary: Lend offer by id
+      tags:
+        - LendOfferController
+      description: This is a description
+      operationId: getLendOfferById
+      parameters:
+        - name: lend_offer_id
+          in: path
+          required: true
+          description: The id of the lend offer
+          schema:
+            type: string
+      responses:
+        200:
+          description: This means its ok
+          content:
+            application/json:
               schema:
-                type: string
-        responses:
-            200:
-              description: This means its ok
-              content:
-                  application/json:
-                    schema:
-                        $ref: '#/components/schemas/LendOfferGET'
+                $ref: '#/components/schemas/LendOfferGET'
 
 
     delete:
-        summary: Lend offer by id
-        tags:
-            - LendOfferController
-        description: This is a description
-        operationId: deleteLendOfferById
-        parameters:
-            - name: lend_offer_id
-              in: path
-              required: true
-              description: The id of the lend offer
-              schema:
-                type: string
-        responses:
-            200:
-              description: This means its ok
+      summary: Lend offer by id
+      tags:
+        - LendOfferController
+      description: This is a description
+      operationId: deleteLendOfferById
+      parameters:
+        - name: lend_offer_id
+          in: path
+          required: true
+          description: The id of the lend offer
+          schema:
+            type: string
+      responses:
+        200:
+          description: This means its ok
 
+  /api/v1/invitations:
+    post:
+      tags: [ Invitations ]
+      summary: Create invitation
+      operationId: createInvitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitationRequestDto'
+      responses:
+        '201':
+          description: Invitation sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResponseDto'
 
 components:
   schemas:
@@ -652,20 +676,20 @@ components:
           type: string
 
     AvailableSpot:
-        description: This is the available spot model
-        type: object
-        properties:
-            id:
-              description: Id of parking spot
-              type: string
-            start_date:
-              description: Start date of borrow
-              type: string
-              format: date-time
-            end_date:
-              description: End date of borrow
-              type: string
-              format: date-time
+      description: This is the available spot model
+      type: object
+      properties:
+        id:
+          description: Id of parking spot
+          type: string
+        start_date:
+          description: Start date of borrow
+          type: string
+          format: date-time
+        end_date:
+          description: End date of borrow
+          type: string
+          format: date-time
 
     UserGET:
       description: This is the user model
@@ -685,40 +709,40 @@ components:
           type: string
 
     UserPATCH:
-        description: This is the user model
-        type: object
-        properties:
-            name:
-                description: The name of user
-                type: string
-            email:
-                description: Email of user
-                type: string
-            profile_picture_url:
-                description: Profile picture url of user
-                type: string
+      description: This is the user model
+      type: object
+      properties:
+        name:
+          description: The name of user
+          type: string
+        email:
+          description: Email of user
+          type: string
+        profile_picture_url:
+          description: Profile picture url of user
+          type: string
 
     OrganizationGET:
       description: This is the organization model
       type: object
       properties:
-          name:
-            description: The name of organization
-            type: string
-          id:
-            description: Id of organization
-            type: string
-          owner_id:
-            description: Id of owner
-            type: string
+        name:
+          description: The name of organization
+          type: string
+        id:
+          description: Id of organization
+          type: string
+        owner_id:
+          description: Id of owner
+          type: string
 
     OrganizationPOST:
-        description: This is the organization model
-        type: object
-        properties:
-            name:
-                description: The name of organization
-                type: string
+      description: This is the organization model
+      type: object
+      properties:
+        name:
+          description: The name of organization
+          type: string
 
 
     BorrowGET:
@@ -747,26 +771,23 @@ components:
           type: string
 
     BorrowPOST:
-        description: This is the borrow model
-        type: object
-        properties:
-            start_date:
-                description: Start date of borrow
-                type: string
-                format: date-time
-            end_date:
-                description: End date of borrow
-                type: string
-                format: date-time
-            borrower_id:
-                description: Id of user
-                type: string
-            owner_id:
-                description: Id of user
-                type: string
-            spot_id:
-                description: Id of parking spot
-                type: string
+      description: This is the borrow model
+      type: object
+      properties:
+        start_date:
+          description: Start date of borrow
+          type: string
+          format: date-time
+        end_date:
+          description: End date of borrow
+          type: string
+          format: date-time
+        owner_id:
+          description: Id of user
+          type: string
+        spot_id:
+          description: Id of parking spot
+          type: string
 
     LendOfferGET:
       description: This is the lend offer model
@@ -791,61 +812,70 @@ components:
           type: string
 
     LendOfferPOST:
-        description: This is the lend offer model
-        type: object
-        properties:
-            start_date:
-                description: Start date of lend offer
-                type: string
-                format: date-time
-            end_date:
-                description: End date of lend offer
-                type: string
-                format: date-time
-            spot_id:
-                description: Id of parking spot
-                type: string
-            owner_id:
-                description: Id of user
-                type: string
+      description: This is the lend offer model
+      type: object
+      properties:
+        start_date:
+          description: Start date of lend offer
+          type: string
+          format: date-time
+        end_date:
+          description: End date of lend offer
+          type: string
+          format: date-time
+        spot_id:
+          description: Id of parking spot
+          type: string
 
     ParkingGET:
-        description: This is the parking model
-        type: object
-        properties:
-          id:
-            description: Id of parking
-            type: string
-          name:
-            description: The name of parking
-            type: string
-          company_id:
-            description: Id of company
-            type: string
-          parking_definition:
-            description: json of obstacles and the boundary
-            type: string
-          spots:
-            description: List of parking spots
-            type: array
-            items:
-              $ref: '#/components/schemas/ParkingSpot'
+      description: This is the parking model
+      type: object
+      properties:
+        id:
+          description: Id of parking
+          type: string
+        name:
+          description: The name of parking
+          type: string
+        company_id:
+          description: Id of company
+          type: string
+        parking_definition:
+          description: json of obstacles and the boundary
+          type: string
+        spots:
+          description: List of parking spots
+          type: array
+          items:
+            $ref: '#/components/schemas/ParkingSpot'
 
     ParkingPOST:
-        description: This is the parking model
-        type: object
-        properties:
-          name:
-            description: The name of parking
-            type: string
-          company_id:
-            description: Id of company
-            type: string
-          parking_definition:
-            description: json of obstacles and the boundary
-            type: string
-          spots:
-            description: List of parking spots
-            type: array
-            items:
-              $ref: '#/components/schemas/ParkingSpot'
+      description: This is the parking model
+      type: object
+      properties:
+        name:
+          description: The name of parking
+          type: string
+        parking_definition:
+          description: json of obstacles and the boundary
+          type: string
+
+    InvitationResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        organization_id:
+          type: string
+        invited_at:
+          type: string
+          format: date-time
+
+    InvitationRequestDto:
+      type: object
+      required: [ email ]
+      properties:
+        email:
+          type: string
