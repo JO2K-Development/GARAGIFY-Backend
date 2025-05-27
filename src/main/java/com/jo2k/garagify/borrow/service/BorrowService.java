@@ -1,57 +1,88 @@
 package com.jo2k.garagify.borrow.service;
 
 import com.jo2k.dto.BorrowGET;
+import com.jo2k.dto.BorrowPOST;
+import com.jo2k.garagify.auth.service.CurrentUserProvider;
 import com.jo2k.garagify.borrow.model.Borrow;
 import com.jo2k.garagify.borrow.repository.BorrowRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import com.jo2k.garagify.user.service.UserService;
 
+import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Profile("prod")
+@Profile("local")
+@Primary
 public class BorrowService implements IBorrowService {
     private final BorrowRepository borrowRepository;
-
+//    private final LendOfferRepository lendOfferRepository;
+    private final CurrentUserProvider currentUserProvider;
+    @PostConstruct
+    public void init() {
+        System.out.println("BorrowServiceDev loaded!");
+    }
     @Override
-    public Page<BorrowGET> getAllBorrows(Pageable pageable, OffsetDateTime start, OffsetDateTime end, UUID borrowerId) {
-        Specification<Borrow> spec = Specification.where(null);
+    public List<BorrowGET> createBorrowsIfNotExistsAndAvailable(List<BorrowPOST> borrowPOSTs) {
+        List<BorrowGET> createdBorrows = new ArrayList<>();
+        UUID currentUserId = currentUserProvider.getCurrentUserId();
+        boolean conditionsCorrect = true;
+        for (BorrowPOST post : borrowPOSTs) {
+            // Check if the borrow time overlaps with existing borrows for the same parking spot
+            boolean existsBorrow = borrowRepository.existsOverlap(
+                    UUID.fromString(post.getSpotId()),
+                    LocalDateTime.from(post.getStartDate()),
+                    LocalDateTime.from(post.getEndDate())
+            );
+            // Check if there is a LendOffer for the parking spots within the specified time range
+//            boolean existsLendOffer = borrowRepository.existsLendOffer(
+//                    UUID.fromString(post.getSpotId()),
+//                    LocalDateTime.from(post.getStartDate()),
+//                    LocalDateTime.from(post.getEndDate())
+//            );
 
-        if (start != null) {
-            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("borrowTime"), start.toLocalDateTime()));
+//            if (existsBorrow || !existsLendOffer) {
+//                conditionsCorrect = false;
+//                break; // If any condition is not met, we stop processing further
+//            }
         }
 
-        if (end != null) {
-            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("returnTime"), end.toLocalDateTime()));
-        }
+        if(conditionsCorrect)
+            for (BorrowPOST post : borrowPOSTs) {
 
-        if (borrowerId != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("userId"), borrowerId));
-        }
+                    Borrow borrow = Borrow.builder()
+                            .userId(currentUserId)
+                            .parkingSpotId(UUID.fromString(post.getSpotId()))
+                            .borrowTime(LocalDateTime.from(post.getStartDate()))
+                            .returnTime(LocalDateTime.from(post.getEndDate()))
+                            .build();
 
-        return borrowRepository.findAll(spec, pageable)
-                .map(this::mapToDTO);
+                    Borrow saved = borrowRepository.save(borrow);
+                    createdBorrows.add(mapToDTO(saved));
+
+            }
+
+        return createdBorrows;
     }
 
-    @Override
-    public Borrow createBorrow(Borrow borrow) {
-        // You can add validation/business logic here before saving
-        return borrowRepository.save(borrow);
-    }
-
-    private BorrowGET mapToDTO(Borrow b) {
+    public BorrowGET mapToDTO(Borrow borrow) {
         return new BorrowGET()
-                .id(String.valueOf(b.getId()))
-                .startDate(b.getBorrowTime().atOffset(OffsetDateTime.now().getOffset()))
-                .endDate(b.getReturnTime() != null ? b.getReturnTime().atOffset(OffsetDateTime.now().getOffset()) : null)
-                .spotId(String.valueOf(b.getParkingSpotId()))
-                .borrowerId(String.valueOf(b.getUserId()))
-                .ownerId(null);  // fill if available
+                .id(borrow.getId().toString())
+                .spotId(borrow.getParkingSpotId().toString())
+                .borrowerId(borrow.getUserId().toString())
+                .startDate(borrow.getBorrowTime().atOffset(ZoneOffset.UTC))
+                .endDate(borrow.getReturnTime().atOffset(ZoneOffset.UTC));
     }
 }

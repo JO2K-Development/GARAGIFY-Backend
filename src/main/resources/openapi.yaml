@@ -378,24 +378,28 @@ paths:
 
   /api/v1/borrow:
     post:
-        summary: Borrow a parking spot
+        summary: Borrow a list of parking spots
         tags:
             - BorrowController
         description: This is a description
-        operationId: createBorrow
+        operationId: createBorrows
         requestBody:
             required: true
             content:
               application/json:
                   schema:
-                    $ref: '#/components/schemas/BorrowPOST'
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BorrowPOST'
         responses:
             200:
               description: This means its ok
               content:
                   application/json:
                     schema:
-                        $ref: '#/components/schemas/BorrowGET'
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BorrowGET'
 
     get:
         summary: Borrows by filters
@@ -742,9 +746,6 @@ components:
         borrower_id:
           description: Id of user
           type: string
-        owner_id:
-          description: Id of user
-          type: string
 
     BorrowPOST:
         description: This is the borrow model
@@ -758,12 +759,6 @@ components:
                 description: End date of borrow
                 type: string
                 format: date-time
-            borrower_id:
-                description: Id of user
-                type: string
-            owner_id:
-                description: Id of user
-                type: string
             spot_id:
                 description: Id of parking spot
                 type: string
