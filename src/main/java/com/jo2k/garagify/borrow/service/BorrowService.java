@@ -5,6 +5,7 @@ import com.jo2k.dto.BorrowPOST;
 import com.jo2k.garagify.auth.service.CurrentUserProvider;
 import com.jo2k.garagify.borrow.model.Borrow;
 import com.jo2k.garagify.borrow.repository.BorrowRepository;
+import com.jo2k.garagify.lendoffer.repository.LendOfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
@@ -28,7 +29,7 @@ import java.util.UUID;
 @Primary
 public class BorrowService implements IBorrowService {
     private final BorrowRepository borrowRepository;
-//    private final LendOfferRepository lendOfferRepository;
+    private final LendOfferRepository lendOfferRepository;
     private final CurrentUserProvider currentUserProvider;
     @PostConstruct
     public void init() {
@@ -38,7 +39,12 @@ public class BorrowService implements IBorrowService {
     public List<BorrowGET> createBorrowsIfNotExistsAndAvailable(List<BorrowPOST> borrowPOSTs) {
         List<BorrowGET> createdBorrows = new ArrayList<>();
         UUID currentUserId = currentUserProvider.getCurrentUserId();
-        boolean conditionsCorrect = true;
+        System.out.println("WHAT THE FUC");
+
+        if(borrowPOSTs.getFirst().getEndDate() == null) {
+            System.out.println("WHAT THE FUC");
+        }
+
         for (BorrowPOST post : borrowPOSTs) {
             // Check if the borrow time overlaps with existing borrows for the same parking spot
             boolean existsBorrow = borrowRepository.existsOverlap(
@@ -47,33 +53,35 @@ public class BorrowService implements IBorrowService {
                     LocalDateTime.from(post.getEndDate())
             );
             // Check if there is a LendOffer for the parking spots within the specified time range
-//            boolean existsLendOffer = borrowRepository.existsLendOffer(
-//                    UUID.fromString(post.getSpotId()),
-//                    LocalDateTime.from(post.getStartDate()),
-//                    LocalDateTime.from(post.getEndDate())
-//            );
+            boolean existsLendOffer = !lendOfferRepository.existsByParkingSpotIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                    UUID.fromString(post.getSpotId()),
+                    LocalDateTime.from(post.getStartDate()),
+                    LocalDateTime.from(post.getEndDate())
+            );
 
-//            if (existsBorrow || !existsLendOffer) {
-//                conditionsCorrect = false;
-//                break; // If any condition is not met, we stop processing further
-//            }
+            if (existsBorrow){
+                throw new IllegalArgumentException("Borrow already exists for this parking spot in the specified time range. For borrow: \n{" + post + "}");
+            }
+            if (existsLendOffer) {
+                throw new IllegalArgumentException("No LendOffer available for this parking spot in the specified time range. For borrow: \n{" + post + "}");
+            }
         }
 
-        if(conditionsCorrect)
-            for (BorrowPOST post : borrowPOSTs) {
 
-                    Borrow borrow = Borrow.builder()
-                            .userId(currentUserId)
-                            .parkingSpotId(UUID.fromString(post.getSpotId()))
-                            .borrowTime(LocalDateTime.from(post.getStartDate()))
-                            .returnTime(LocalDateTime.from(post.getEndDate()))
-                            .build();
+        for (BorrowPOST post : borrowPOSTs) {
+            Borrow borrow = new Borrow();
+            borrow.setId(UUID.randomUUID());
+            borrow.setParkingSpotId(UUID.fromString(post.getSpotId()));
+            borrow.setUserId(currentUserId);
+            borrow.setBorrowTime(LocalDateTime.from(post.getStartDate()));
+            borrow.setReturnTime(LocalDateTime.from(post.getEndDate()));
 
-                    Borrow saved = borrowRepository.save(borrow);
-                    createdBorrows.add(mapToDTO(saved));
+            // Save the borrow to the repository
+            borrowRepository.save(borrow);
 
-            }
-
+            // Map to DTO and add to the result list
+            createdBorrows.add(mapToDTO(borrow));
+        }
         return createdBorrows;
     }
 

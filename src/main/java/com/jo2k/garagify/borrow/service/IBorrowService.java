@@ -7,5 +7,5 @@ import java.util.List;
 
 
 public interface IBorrowService {
-    public List<BorrowGET> createBorrowsIfNotExistsAndAvailable(List<BorrowPOST> borrowPOSTs);
+    List<BorrowGET> createBorrowsIfNotExistsAndAvailable(List<BorrowPOST> borrowPOSTs);
 }

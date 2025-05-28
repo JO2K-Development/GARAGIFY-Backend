@@ -205,6 +205,14 @@
                                 <useTags>true</useTags>
                             </configOptions>
 
+
+                            <additionalProperties>
+                                <generateDefaultInterfaceMethods>false</generateDefaultInterfaceMethods>
+                                <useSpringBoot>true</useSpringBoot>
+                                <!-- Use ResponseEntity in generated endpoints -->
+                                <useResponseEntity>true</useResponseEntity>
+                                <interfaceOnly>true</interfaceOnly> <!-- optional -->
+                            </additionalProperties>
                         </configuration>
                     </execution>
                 </executions>

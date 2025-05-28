@@ -7,11 +7,13 @@ import com.jo2k.garagify.borrow.service.IBorrowService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
+import java.util.Map;
+@Validated
 @RestController
 public class BorrowController implements BorrowControllerApi {
 
@@ -22,8 +24,16 @@ public class BorrowController implements BorrowControllerApi {
     }
     public ResponseEntity<List<BorrowGET>> createBorrows(
             @Valid @RequestBody List<@Valid BorrowPOST> borrowPOSTs) {
-        System.out.println("AAa");
-        List<BorrowGET> result = borrowService.createBorrowsIfNotExistsAndAvailable(borrowPOSTs);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+
+        try {
+            System.out.println("AAa");
+
+            List<BorrowGET> result = borrowService.createBorrowsIfNotExistsAndAvailable(borrowPOSTs);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body((List<BorrowGET>) Map.of("message", e.toString()));
+        }
     }
 }
