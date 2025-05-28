@@ -23,7 +23,7 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
-            "/api/v1/**" //TODO: remove this line when all endpoints are secured
+//            "/api/v1/**" //TODO: remove this line when all endpoints are secured
     };
 
     @Bean

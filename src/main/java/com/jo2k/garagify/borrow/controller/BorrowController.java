@@ -26,11 +26,13 @@ public class BorrowController implements BorrowControllerApi {
             @Valid @RequestBody List<@Valid BorrowPOST> borrowPOSTs) {
 
         try {
-            System.out.println("AAa");
 
+            System.out.println("AAa");
             List<BorrowGET> result = borrowService.createBorrowsIfNotExistsAndAvailable(borrowPOSTs);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (IllegalArgumentException e) {
+            System.out.println("AAa1");
+            e.printStackTrace();
             return ResponseEntity
                     .badRequest()
                     .body((List<BorrowGET>) Map.of("message", e.toString()));
