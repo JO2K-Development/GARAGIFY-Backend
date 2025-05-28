@@ -259,7 +259,7 @@ paths:
     get:
       summary: Organization by id
       tags:
-        - UserController
+        - OrganizationController
       description: This is a description
       operationId: getOrganizationById
       parameters:
@@ -338,13 +338,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageDto'
+                type: object
                 properties:
                   content:
                     type: array
                     items:
                       $ref: '#/components/schemas/ParkingGET'
-
+                  totalElements:
+                    type: integer
+                    description: Total number of elements
+                  totalPages:
+                    type: integer
+                    description: Total number of pages
+                  page:
+                    type: integer
+                    description: Current page number
+                  size:
+                    type: integer
+                    description: Number of elements per page
     post:
       summary: Creating the parking for the organization
       tags:
@@ -427,19 +438,21 @@ paths:
           schema:
             type: string
           description: The id of the borrower to filter by
-
+        - name: owner_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: The id of the owner to filter by
       responses:
         200:
           description: This means its ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageDto'
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/LendOfferGET'
+                type: array
+                items:
+                  $ref: '#/components/schemas/BorrowGET'
 
   /api/v1/borrow/{borrow_id}:
     get:
@@ -544,20 +557,13 @@ paths:
           schema:
             type: string
           description: The id of the owner to filter by
-
       responses:
         200:
           description: This means its ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageDto'
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/LendOfferGET'
-
+                $ref: '#/components/schemas/PagedLendOfferGETResponse'
 
 
   /api/v1/lend-offer/{lend_offer_id}:
@@ -600,6 +606,24 @@ paths:
         200:
           description: This means its ok
 
+  /api/v1/invitations:
+    post:
+      tags: [ Invitations ]
+      summary: Create invitation
+      operationId: createInvitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitationPOST'
+      responses:
+        '201':
+          description: Invitation sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationGET'
 
 components:
   schemas:
@@ -753,9 +777,6 @@ components:
           description: End date of borrow
           type: string
           format: date-time
-        borrower_id:
-          description: Id of user
-          type: string
         owner_id:
           description: Id of user
           type: string
@@ -800,9 +821,6 @@ components:
         spot_id:
           description: Id of parking spot
           type: string
-        owner_id:
-          description: Id of user
-          type: string
 
     ParkingGET:
       description: This is the parking model
@@ -833,58 +851,81 @@ components:
         name:
           description: The name of parking
           type: string
-        company_id:
-          description: Id of company
-          type: string
         parking_definition:
           description: json of obstacles and the boundary
           type: string
-        spots:
-          description: List of parking spots
-          type: array
-          items:
-            $ref: '#/components/schemas/ParkingSpot'
 
+    InvitationGET:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        organization_id:
+          type: string
+        invited_at:
+          type: string
+          format: date-time
 
-    PageDto:
+    InvitationPOST:
+      type: object
+      required: [ email ]
+      properties:
+        email:
+          type: string
+
+    PagedResponse:
+      description: Generic paginated response wrapper
       type: object
       properties:
         content:
           type: array
-          items: { }  # Will be overridden per endpoint
-        pageable:
-          type: object
-          properties:
-            pageNumber:
-              type: integer
-              description: Current page number (zero-based)
-            pageSize:
-              type: integer
-              description: Number of items per page
-            sort:
-              type: object
-              properties:
-                sorted:
-                  type: boolean
-                  description: Whether results are sorted
-                unsorted:
-                  type: boolean
-                  description: Whether results are unsorted
-                empty:
-                  type: boolean
-                  description: Whether sort is empty
+          items: { }
+          description: List of items for current page
         totalElements:
           type: integer
-          description: Total number of elements
+          format: int64
+          description: Total number of elements across all pages
+          example: 3
         totalPages:
           type: integer
+          format: int32
           description: Total number of pages
-        last:
-          type: boolean
-          description: Whether this is the last page
-        first:
-          type: boolean
-          description: Whether this is the first page
-        empty:
-          type: boolean
-          description: Whether the result is empty
+          example: 1
+        page:
+          type: integer
+          format: int32
+          description: Current page number (0-based)
+          example: 0
+        size:
+          type: integer
+          format: int32
+          description: Number of elements per page
+          example: 10
+      required:
+        - content
+        - totalElements
+        - totalPages
+        - page
+        - size
+
+    PagedLendOfferGETResponse:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/LendOfferGET'
+
+    PagedParkingGETResponse:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ParkingGET'

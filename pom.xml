@@ -185,6 +185,10 @@
             <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-hateoas</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -219,6 +223,12 @@
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <useTags>true</useTags>
                             </configOptions>
+                            <!-- Use ResponseEntity in generated endpoints -->
+                            <additionalProperties>
+                                <useSpringBoot>true</useSpringBoot>
+                                <useResponseEntity>true</useResponseEntity>
+                                <interfaceOnly>true</interfaceOnly> <!-- optional -->
+                            </additionalProperties>
 
                         </configuration>
                     </execution>
