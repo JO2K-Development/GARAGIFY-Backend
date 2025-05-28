@@ -36,27 +36,50 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenDto'
 
-  /api/v1/auth/refresh:
-    post:
+#  /api/v1/auth/refresh:
+#    post:
+#      tags:
+#        - AuthController
+#      summary: Refresh JWT token
+#      operationId: refreshToken
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/TokenVerificationForm'
+#      responses:
+#        '200':
+#          description: New JWT tokens returned
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/TokenDto'
+
+  /api/v1/spots/{owner_id}:
+    get:
+      summary: Get parking spots by owner id
       tags:
-        - AuthController
-      summary: Refresh JWT token
-      operationId: refreshToken
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TokenVerificationForm'
+        - ParkingSpotsController
+      description: This is a description
+      operationId: getParkingSpotsByOwnerId
+      parameters:
+        - name: owner_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The id of the owner to filter by
+
       responses:
-        '200':
-          description: New JWT tokens returned
+        200:
+          description: This means it's ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenDto'
-
-
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParkingSpot'
 
 
   /api/v1/spots/available-dates/{parking_id}:
@@ -64,7 +87,7 @@ paths:
       summary: Dates with parking slots available
       tags:
         - ParkingSpotsController
-      description: DO USTALENIA with available spots with the selected filters for the selected parking
+      description: list of dates where every even number signifies beginning of availability of a spot and odd number signifies its end. With the selected filters for the selected parking
       operationId: getAvailableParkingDates
       parameters:
         - name: parking_id
@@ -211,95 +234,104 @@ paths:
                 items:
                   $ref: '#/components/schemas/AvailableSpot'
 
-  /api/v1/user:
-    patch:
-        summary: Patch user fields
-        tags:
-            - UserController
-        description: This is a description
-        operationId: updateUser
-        requestBody:
-            required: true
-            content:
-              application/json:
-                  schema:
-                    $ref: '#/components/schemas/UserPATCH'
-        responses:
-            200:
-              description: This means its ok
-              content:
-                  application/json:
-                    schema:
-                        $ref: '#/components/schemas/UserGET'
-
-  /api/v1/user/by-spot-id/{spot_id}:
+  /api/v1/user/:
     get:
-      summary: User by spot id
+      summary: Get users by UUIDs
       tags:
-        - ParkingSpotsController
-      description: This is a description
-      operationId: getUserBySpotId
+          - UserController
       parameters:
-        - name: spot_id
-          in: path
+        - in: query
+          name: ids
           required: true
-          description: The id of the parking spot
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          description: List of user UUIDs
       responses:
-        200:
-          description: This means its ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserGET'
-
-
-  /api/v1/organization/{organization_id}:
-    get:
-      summary: Organization by id
-      tags:
-        - UserController
-      description: This is a description
-      operationId: getOrganizationById
-      parameters:
-        - name: organization_id
-          in: path
-          required: true
-          description: The id of the organization
-          schema:
-            type: string
-      responses:
-        200:
-          description: This means its ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrganizationGET'
-
-  /api/v1/organization/{owner_id}:
-    get:
-      summary: Organizations by owner id
-      tags:
-        - OrganizationController
-      description: This is a description
-      operationId: getOrganizationsByOwnerId
-      parameters:
-        - name: owner_id
-          in: path
-          required: true
-          description: The id of the owner
-          schema:
-            type: string
-      responses:
-        200:
-          description: This means its ok
+        '200':
+          description: A list of users
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OrganizationGET'
+                  $ref: '#/components/schemas/UserGET'
+        '400':
+          description: Invalid UUID or missing parameter
+
+
+
+#  /api/v1/user/by-spot-id/{spot_id}:
+#    get:
+#      summary: User by spot id
+#      tags:
+#        - ParkingSpotsController
+#      description: This is a description
+#      operationId: getUserBySpotId
+#      parameters:
+#        - name: spot_id
+#          in: path
+#          required: true
+#          description: The id of the parking spot
+#          schema:
+#            type: string
+#      responses:
+#        200:
+#          description: This means its ok
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/UserGET'
+
+
+#  /api/v1/organization/{organization_id}:
+#    get:
+#      summary: Organization by id
+#      tags:
+#        - UserController
+#      description: This is a description
+#      operationId: getOrganizationById
+#      parameters:
+#        - name: organization_id
+#          in: path
+#          required: true
+#          description: The id of the organization
+#          schema:
+#            type: string
+#      responses:
+#        200:
+#          description: This means its ok
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/OrganizationGET'
+#
+#  /api/v1/organization/{owner_id}:
+#    get:
+#      summary: Organizations by owner id
+#      tags:
+#        - OrganizationController
+#      description: This is a description
+#      operationId: getOrganizationsByOwnerId
+#      parameters:
+#        - name: owner_id
+#          in: path
+#          required: true
+#          description: The id of the owner
+#          schema:
+#            type: string
+#      responses:
+#        200:
+#          description: This means its ok
+#          content:
+#            application/json:
+#              schema:
+#                type: array
+#                items:
+#                  $ref: '#/components/schemas/OrganizationGET'
 
   /api/v1/organization/parkings:
     get:
@@ -356,25 +388,25 @@ paths:
                   size:
                     type: integer
                     description: Number of elements per page
-    post:
-      summary: Creating the parking for the organization
-      tags:
-        - OrganizationController
-      description: This is a description
-      operationId: assignParkingToOrganization
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ParkingPOST'
-      responses:
-        200:
-          description: This means its ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParkingGET'
+#    post:
+#      summary: Creating the parking for the organization
+#      tags:
+#        - OrganizationController
+#      description: This is a description
+#      operationId: assignParkingToOrganization
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/ParkingPOST'
+#      responses:
+#        200:
+#          description: This means its ok
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/ParkingGET'
 
   /api/v1/borrow:
     post:
@@ -400,6 +432,15 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BorrowGET'
+            400:
+              description: Bad Request
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
 
     get:
         summary: Borrows by filters
@@ -642,15 +683,6 @@ components:
         id:
           description: Id of parking spot
           type: string
-        x:
-          description: X coordinate of parking spot
-          type: number
-        y:
-          description: Y coordinate of parking spot
-          type: number
-        rot:
-          description: Rotation of parking spot
-          type: number
         id_owner:
           description: Id of owner
           type: string
@@ -688,41 +720,41 @@ components:
           description: Profile picture url of user
           type: string
 
-    UserPATCH:
-        description: This is the user model
-        type: object
-        properties:
-            name:
-                description: The name of user
-                type: string
-            email:
-                description: Email of user
-                type: string
-            profile_picture_url:
-                description: Profile picture url of user
-                type: string
+#    UserPATCH:
+#        description: This is the user model
+#        type: object
+#        properties:
+#            name:
+#                description: The name of user
+#                type: string
+#            email:
+#                description: Email of user
+#                type: string
+#            profile_picture_url:
+#                description: Profile picture url of user
+#                type: string
 
-    OrganizationGET:
-      description: This is the organization model
-      type: object
-      properties:
-          name:
-            description: The name of organization
-            type: string
-          id:
-            description: Id of organization
-            type: string
-          owner_id:
-            description: Id of owner
-            type: string
-
-    OrganizationPOST:
-        description: This is the organization model
-        type: object
-        properties:
-            name:
-                description: The name of organization
-                type: string
+#    OrganizationGET:
+#      description: This is the organization model
+#      type: object
+#      properties:
+#          name:
+#            description: The name of organization
+#            type: string
+#          id:
+#            description: Id of organization
+#            type: string
+#          owner_id:
+#            description: Id of owner
+#            type: string
+#
+#    OrganizationPOST:
+#        description: This is the organization model
+#        type: object
+#        properties:
+#            name:
+#                description: The name of organization
+#                type: string
 
 
     BorrowGET:
@@ -750,6 +782,10 @@ components:
     BorrowPOST:
         description: This is the borrow model
         type: object
+        required:
+          - start_date
+          - end_date
+          - spot_id
         properties:
             start_date:
                 description: Start date of borrow
@@ -826,21 +862,21 @@ components:
             items:
               $ref: '#/components/schemas/ParkingSpot'
 
-    ParkingPOST:
-        description: This is the parking model
-        type: object
-        properties:
-          name:
-            description: The name of parking
-            type: string
-          company_id:
-            description: Id of company
-            type: string
-          parking_definition:
-            description: json of obstacles and the boundary
-            type: string
-          spots:
-            description: List of parking spots
-            type: array
-            items:
-              $ref: '#/components/schemas/ParkingSpot'
+#    ParkingPOST:
+#        description: This is the parking model
+#        type: object
+#        properties:
+#          name:
+#            description: The name of parking
+#            type: string
+#          company_id:
+#            description: Id of company
+#            type: string
+#          parking_definition:
+#            description: json of obstacles and the boundary
+#            type: string
+#          spots:
+#            description: List of parking spots
+#            type: array
+#            items:
+#              $ref: '#/components/schemas/ParkingSpot'
