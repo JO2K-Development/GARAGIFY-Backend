@@ -3,7 +3,7 @@ package com.jo2k.garagify.lendoffer.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -21,10 +21,10 @@ public class LendOffer {
     private UUID id;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDateTime startDate;
+    private OffsetDateTime startDate;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
+    private OffsetDateTime endDate;
 
     @Column(name = "parking_spot_id", nullable = false)
     private UUID parkingSpotId;
@@ -33,10 +33,10 @@ public class LendOffer {
     private UUID ownerId;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @PrePersist
     public void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now();
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class LendOfferService implements ILendOfferService {
     @Override
     @Transactional
     public LendOffer createLendOffer(UUID parkingSpotId, UUID ownerId,
-                                     LocalDateTime startDate, LocalDateTime endDate) {
+                                     OffsetDateTime startDate, OffsetDateTime endDate) {
         validateTimeRange(startDate, endDate);
         checkAvailability(parkingSpotId, startDate, endDate);
 
@@ -39,7 +40,7 @@ public class LendOfferService implements ILendOfferService {
     }
 
     @Override
-    public Page<LendOffer> getAllLendOffers(LocalDateTime startDate, LocalDateTime endDate,
+    public Page<LendOffer> getAllLendOffers(OffsetDateTime startDate, OffsetDateTime endDate,
                                             UUID ownerId, Pageable pageable) {
         Specification<LendOffer> spec = Specification.where(null);
 
@@ -69,7 +70,7 @@ public class LendOfferService implements ILendOfferService {
 
     @Override
     @Transactional
-    public LendOffer updateLendOffer(UUID id, LocalDateTime startDate, LocalDateTime endDate) {
+    public LendOffer updateLendOffer(UUID id, OffsetDateTime startDate, OffsetDateTime endDate) {
         validateTimeRange(startDate, endDate);
 
         LendOffer offer = getLendOfferById(id);
@@ -108,8 +109,8 @@ public class LendOfferService implements ILendOfferService {
 
         // Optional: re-validate and re-check availability if startDate or endDate were patched
         if (updates.containsKey("startDate") || updates.containsKey("endDate")) {
-            LocalDateTime start = offer.getStartDate();
-            LocalDateTime end = offer.getEndDate();
+            OffsetDateTime start = offer.getStartDate();
+            OffsetDateTime end = offer.getEndDate();
             validateTimeRange(start, end);
             checkAvailability(offer.getParkingSpotId(), start, end, offer.getId());
         }
@@ -128,8 +129,8 @@ public class LendOfferService implements ILendOfferService {
 
     @Override
     public boolean isParkingSpotAvailable(UUID parkingSpotId,
-                                          LocalDateTime startDate,
-                                          LocalDateTime endDate) {
+                                          OffsetDateTime startDate,
+                                          OffsetDateTime endDate) {
         validateTimeRange(startDate, endDate);
         List<LendOffer> overlapping = lendOfferRepository.findOverlappingOffers(
                 parkingSpotId, startDate, endDate);
@@ -141,22 +142,22 @@ public class LendOfferService implements ILendOfferService {
         return lendOfferRepository.findByParkingSpotId(parkingSpotId);
     }
 
-    private void validateTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
+    private void validateTimeRange(OffsetDateTime startDate, OffsetDateTime endDate) {
         if (startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("End date must be after start date");
         }
-        if (startDate.isBefore(LocalDateTime.now())) {
+        if (startDate.isBefore(OffsetDateTime.now())) {
             throw new IllegalArgumentException("Start date cannot be in the past");
         }
     }
 
-    private void checkAvailability(UUID parkingSpotId, LocalDateTime startDate,
-                                   LocalDateTime endDate) {
+    private void checkAvailability(UUID parkingSpotId, OffsetDateTime startDate,
+                                   OffsetDateTime endDate) {
         checkAvailability(parkingSpotId, startDate, endDate, null);
     }
 
-    private void checkAvailability(UUID parkingSpotId, LocalDateTime startDate,
-                                   LocalDateTime endDate, UUID excludeOfferId) {
+    private void checkAvailability(UUID parkingSpotId, OffsetDateTime startDate,
+                                   OffsetDateTime endDate, UUID excludeOfferId) {
         List<LendOffer> overlapping = lendOfferRepository.findOverlappingOffers(
                 parkingSpotId, startDate, endDate);
 

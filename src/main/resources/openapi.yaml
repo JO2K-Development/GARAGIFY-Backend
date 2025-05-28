@@ -588,6 +588,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/LendOfferGET'
 
+    put:
+      summary: Update lend offer by id
+      tags:
+        - LendOfferController
+      description: Update an existing lend offer
+      operationId: updateLendOfferById
+      parameters:
+        - name: lend_offer_id
+          in: path
+          required: true
+          description: The id of the lend offer
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LendOfferPUT'
+      responses:
+        200:
+          description: Successfully updated lend offer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LendOfferGET'
+        400:
+          description: Invalid input
+        404:
+          description: Lend offer not found
 
     delete:
       summary: Lend offer by id
@@ -791,6 +821,25 @@ components:
         id:
           description: Id of lend offer
           type: string
+        start_date:
+          description: Start date of lend offer
+          type: string
+          format: date-time
+        end_date:
+          description: End date of lend offer
+          type: string
+          format: date-time
+        spot_id:
+          description: Id of parking spot
+          type: string
+        owner_id:
+          description: Id of user
+          type: string
+
+    LendOfferPUT:
+      description: This is the lend offer put model
+      type: object
+      properties:
         start_date:
           description: Start date of lend offer
           type: string

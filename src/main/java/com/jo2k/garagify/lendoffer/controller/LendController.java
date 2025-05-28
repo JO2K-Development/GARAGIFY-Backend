@@ -1,7 +1,9 @@
 package com.jo2k.garagify.lendoffer.controller;
 
+import com.jo2k.api.LendOfferControllerApi;
 import com.jo2k.dto.LendOfferGET;
 import com.jo2k.dto.LendOfferPOST;
+import com.jo2k.dto.LendOfferPUT;
 import com.jo2k.dto.PagedLendOfferGETResponse;
 import com.jo2k.garagify.lendoffer.mapper.LendOfferMapper;
 import com.jo2k.garagify.lendoffer.model.LendOffer;
@@ -16,26 +18,24 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/lend-offer")
 @RequiredArgsConstructor
-public class LendController {
+public class LendController implements LendOfferControllerApi {
 
     private final ILendOfferService lendOfferService;
     private final UserService userService;
     private final LendOfferMapper lendOfferMapper;
 
-
-    @PostMapping
+    @Override
     public ResponseEntity<LendOfferGET> createLendOffer(@RequestBody LendOfferPOST lendOfferPOST) {
         LendOffer lendOffer = lendOfferService.createLendOffer(
                 UUID.fromString(lendOfferPOST.getSpotId()),
                 userService.getCurrentUser().getId(),
-                lendOfferPOST.getStartDate().toLocalDateTime(),
-                lendOfferPOST.getEndDate().toLocalDateTime()
+                lendOfferPOST.getStartDate(),
+                lendOfferPOST.getEndDate()
         );
 
         LendOfferGET createdOffer = lendOfferMapper.toDto(lendOffer);
@@ -49,15 +49,13 @@ public class LendController {
         return ResponseEntity.created(location).body(createdOffer);
     }
 
-
-    @GetMapping
+    @Override
     public ResponseEntity<PagedLendOfferGETResponse> getAllLendOffers(
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime start_date,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start_date,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end_date,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime end_date,
             @RequestParam(required = false) String owner_id) {
 
         PageRequest pageable = PageRequest.of(page, size);
@@ -81,30 +79,29 @@ public class LendController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{lend_offer_id}")
+    @Override
     public ResponseEntity<LendOfferGET> getLendOfferById(@PathVariable("lend_offer_id") String lendOfferId) {
         LendOffer lendOffer = lendOfferService.getLendOfferById(UUID.fromString(lendOfferId));
         LendOfferGET dto = lendOfferMapper.toDto(lendOffer);
         return ResponseEntity.ok(dto);
     }
 
-    @PutMapping("/{lend_offer_id}")
-    public ResponseEntity<LendOfferGET> updateLendOffer(
+    @Override
+    public ResponseEntity<LendOfferGET> updateLendOfferById(
             @PathVariable("lend_offer_id") String lendOfferId,
-            @RequestBody LendOfferPOST lendOfferPOST) {
+            @RequestBody LendOfferPUT lendOfferPUT) {
 
         LendOffer updatedLendOffer = lendOfferService.updateLendOffer(
                 UUID.fromString(lendOfferId),
-                lendOfferPOST.getStartDate().toLocalDateTime(),
-                lendOfferPOST.getEndDate().toLocalDateTime()
+                lendOfferPUT.getStartDate(),
+                lendOfferPUT.getEndDate()
         );
-
         LendOfferGET dto = lendOfferMapper.toDto(updatedLendOffer);
         return ResponseEntity.ok(dto);
     }
 
 
-    @DeleteMapping("/{lend_offer_id}")
+    @Override
     public ResponseEntity<Void> deleteLendOfferById(@PathVariable("lend_offer_id") String lendOfferId) {
         lendOfferService.deleteLendOffer(UUID.fromString(lendOfferId));
         return ResponseEntity.ok().build();

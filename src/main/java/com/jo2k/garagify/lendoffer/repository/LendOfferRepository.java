@@ -6,8 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,8 +18,8 @@ public interface LendOfferRepository
             "(:endDate IS NULL OR lo.endDate <= :endDate) AND " +
             "(:ownerId IS NULL OR lo.ownerId = :ownerId)")
     List<LendOffer> findByFilters(
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate,
+            @Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate,
             @Param("ownerId") UUID ownerId
     );
 
@@ -30,16 +29,16 @@ public interface LendOfferRepository
             "lo.endDate >= :startDate")
     List<LendOffer> findOverlappingOffers(
             @Param("parkingSpotId") UUID parkingSpotId,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate
+            @Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate
     );
 
     List<LendOffer> findByParkingSpotId(UUID parkingSpotId);
 
     boolean existsByParkingSpotIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
             UUID parkingSpotId,
-            LocalDateTime endDate,
-            LocalDateTime startDate
+            OffsetDateTime endDate,
+            OffsetDateTime startDate
     );
 
 }

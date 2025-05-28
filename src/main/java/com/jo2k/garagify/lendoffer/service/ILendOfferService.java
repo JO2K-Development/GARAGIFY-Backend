@@ -4,7 +4,7 @@ import com.jo2k.garagify.lendoffer.model.LendOffer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.Map;
@@ -25,8 +25,8 @@ public interface ILendOfferService {
      */
     LendOffer createLendOffer(UUID parkingSpotId,
                               UUID ownerId,
-                              LocalDateTime startDate,
-                              LocalDateTime endDate);
+                              OffsetDateTime startDate,
+                              OffsetDateTime endDate);
 
     /**
      * Gets all lend offers with optional filters
@@ -36,8 +36,8 @@ public interface ILendOfferService {
      * @param pageable Pagination information
      * @return Page of lend offers matching criteria
      */
-    Page<LendOffer> getAllLendOffers(LocalDateTime startDate,
-                                     LocalDateTime endDate,
+    Page<LendOffer> getAllLendOffers(OffsetDateTime startDate,
+                                     OffsetDateTime endDate,
                                      UUID ownerId,
                                      Pageable pageable);
 
@@ -58,8 +58,8 @@ public interface ILendOfferService {
      * @throws com.jo2k.garagify.common.exception.ResourceNotFoundException if not found
      */
     LendOffer updateLendOffer(UUID id,
-                              LocalDateTime startDate,
-                              LocalDateTime endDate);
+                              OffsetDateTime startDate,
+                              OffsetDateTime endDate);
 
     /**
      * Partially updates a lend offer
@@ -84,8 +84,8 @@ public interface ILendOfferService {
      * @return True if available, false if already booked or offered
      */
     boolean isParkingSpotAvailable(UUID parkingSpotId,
-                                   LocalDateTime startDate,
-                                   LocalDateTime endDate);
+                                   OffsetDateTime startDate,
+                                   OffsetDateTime endDate);
 
     /**
      * Gets all lend offers for a specific parking spot
