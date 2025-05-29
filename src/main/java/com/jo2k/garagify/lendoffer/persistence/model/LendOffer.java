@@ -1,4 +1,4 @@
-package com.jo2k.garagify.lendoffer.model;
+package com.jo2k.garagify.lendoffer.persistence.model;
 
 import jakarta.persistence.*;
 import lombok.*;

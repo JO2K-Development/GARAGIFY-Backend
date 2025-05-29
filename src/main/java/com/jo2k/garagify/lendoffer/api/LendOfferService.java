@@ -1,6 +1,6 @@
-package com.jo2k.garagify.lendoffer.service;
+package com.jo2k.garagify.lendoffer.api;
 
-import com.jo2k.garagify.lendoffer.model.LendOffer;
+import com.jo2k.garagify.lendoffer.persistence.model.LendOffer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Service interface for managing parking spot lend offers
  */
-public interface ILendOfferService {
+public interface LendOfferService {
 
     /**
      * Creates a new lend offer for a parking spot
