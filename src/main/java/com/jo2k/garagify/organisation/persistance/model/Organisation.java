@@ -1,0 +1,16 @@
+package com.jo2k.garagify.organisation.persistance.model;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "organisation")
+public class Organisation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(nullable = false)
+    private String name;
+
+    // getters/setters/constructors
+}

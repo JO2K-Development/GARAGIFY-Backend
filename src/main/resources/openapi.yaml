@@ -388,14 +388,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BorrowPOST'
+              type: array
+              items:
+                $ref: '#/components/schemas/BorrowPOST'
       responses:
-        200:
-          description: This means its ok
+        '201':
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BorrowGET'
+                type: array
+                items:
+                  $ref: '#/components/schemas/BorrowGET'
+        '400':
+          description: Bad request
 
     get:
       summary: Borrows by filters
@@ -795,24 +801,23 @@ components:
           description: Id of user
           type: string
 
+
     BorrowPOST:
-      description: This is the borrow model
       type: object
       properties:
-        start_date:
-          description: Start date of borrow
+        spotId:
           type: string
-          format: date-time
-        end_date:
-          description: End date of borrow
+          format: uuid
+        startDate:
           type: string
-          format: date-time
-        owner_id:
-          description: Id of user
+          format: date-time    # <-- This is important!
+        endDate:
           type: string
-        spot_id:
-          description: Id of parking spot
-          type: string
+          format: date-time    # <-- This is important!
+      required:
+        - spotId
+        - startDate
+        - endDate
 
     LendOfferGET:
       description: This is the lend offer model

@@ -1,5 +1,6 @@
 package com.jo2k.garagify.config.exceptionHandling;
 
+import com.jo2k.garagify.common.exception.InvalidBorrow;
 import com.jo2k.garagify.common.exception.InvalidTokenException;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
@@ -21,5 +22,8 @@ class GlobalExceptionHandler {
         return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
-
+    @ExceptionHandler(InvalidBorrow.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(InvalidBorrow exception) {
+        return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), HttpStatus.BAD_REQUEST);
+    }
 }
