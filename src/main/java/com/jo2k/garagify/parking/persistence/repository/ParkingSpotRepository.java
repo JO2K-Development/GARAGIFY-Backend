@@ -1,6 +1,6 @@
-package com.jo2k.garagify.parking.persistance.repository;
+package com.jo2k.garagify.parking.persistence.repository;
 
-import com.jo2k.garagify.parking.persistance.model.ParkingSpot;
+import com.jo2k.garagify.parking.persistence.model.ParkingSpot;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

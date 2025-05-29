@@ -42,7 +42,7 @@
         <openapi.generator.version>7.4.0</openapi.generator.version>
         <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
         <maven.compiler-plugin.version>3.13.0</maven.compiler-plugin.version>
-
+        <map-struct.version>1.5.5.Final</map-struct.version>
     </properties>
 
     <dependencies>
@@ -200,7 +200,7 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
-            <version>1.5.5.Final</version>
+            <version>${map-struct.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -307,7 +307,6 @@
                         <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
                         </exclude>
                     </excludes>
                 </configuration>

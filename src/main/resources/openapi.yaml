@@ -3,7 +3,6 @@ info:
   title: Garagify
   version: 1.0.0
   description: API
-
 tags:
   - name: AuthController
     description: Handles Google token authentication and JWT refresh operations
@@ -14,7 +13,7 @@ tags:
   - name: LendOfferController
     description: Handles lend offers and borrows, including creation and retrieval by filters
   - name: UserController
-  - name:  ParkingController
+  - name: ParkingController
 paths:
   /api/v1/auth/access:
     post:
@@ -35,7 +34,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenDto'
-
   /api/v1/auth/refresh:
     post:
       tags:
@@ -55,9 +53,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenDto'
-
-
-
   /api/v1/parkings/{parking_id}:
     get:
       operationId: getParking
@@ -76,10 +71,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ParkingGET'
+                $ref: '#/components/schemas/ParkingDTO'
         404:
           description: Not found
-
   /api/v1/parkings/{parking_id}/spots:
     get:
       operationId: getParkingSpots
@@ -100,31 +94,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ParkingSpotGET'
-
-
-
-  /api/v1/user:
-    patch:
-      summary: Patch user fields
-      tags:
-        - UserController
-      description: This is a description
-      operationId: updateUser
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserPATCH'
-      responses:
-        200:
-          description: This means its ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserGET'
-
+                  $ref: '#/components/schemas/ParkingSpotDTO'
   /api/v1/borrow:
     post:
       summary: Borrow a parking spot
@@ -139,7 +109,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/BorrowPOST'
+                $ref: '#/components/schemas/BorrowForm'
       responses:
         '201':
           description: Created
@@ -148,7 +118,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/BorrowGET'
+                  $ref: '#/components/schemas/BorrowDTO'
         '400':
           description: Bad request
   /api/v1/borrow/mine:
@@ -179,8 +149,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageBorrowGET'
-
+                $ref: '#/components/schemas/BorrowListDTO'
+  /api/v1/borrow/{id}:
+    delete:
+      tags:
+        - BorrowController
+      summary: Delete a borrow by its ID
+      description: Deletes the borrow resource with the given UUID.
+      operationId: deleteBorrow
+      parameters:
+        - name: id
+          in: path
+          description: UUID of the borrow to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Borrow deleted successfully, no content returned
   /api/v1/lend-offer:
     post:
       summary: Create a lend offer
@@ -193,15 +180,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LendOfferPOST'
+              $ref: '#/components/schemas/LendOfferPostForm'
       responses:
         200:
           description: This means its ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LendOfferGET'
-
+                $ref: '#/components/schemas/LendOfferDTO'
     get:
       summary: Lend offers by filters
       tags:
@@ -249,9 +235,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PagedLendOfferGETResponse'
-
-
+                $ref: '#/components/schemas/LendOfferListDTO'
   /api/v1/lend-offer/{lend_offer_id}:
     get:
       summary: Lend offer by id
@@ -272,8 +256,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LendOfferGET'
-
+                $ref: '#/components/schemas/LendOfferDTO'
     put:
       summary: Update lend offer by id
       tags:
@@ -292,19 +275,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LendOfferPUT'
+              $ref: '#/components/schemas/LendOfferPutForm'
       responses:
         200:
           description: Successfully updated lend offer
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LendOfferGET'
+                $ref: '#/components/schemas/LendOfferDTO'
         400:
           description: Invalid input
         404:
           description: Lend offer not found
-
     delete:
       summary: Lend offer by id
       tags:
@@ -321,8 +303,6 @@ paths:
       responses:
         200:
           description: This means its ok
-
-
 components:
   schemas:
     TokenVerificationForm:
@@ -332,7 +312,6 @@ components:
           type: string
       required:
         - token
-
     TokenDto:
       type: object
       properties:
@@ -343,41 +322,7 @@ components:
       required:
         - access
         - refresh
-
-
-    UserGET:
-      description: This is the user model
-      type: object
-      properties:
-        name:
-          description: The name of user
-          type: string
-        id:
-          description: Id of user
-          type: string
-        email:
-          description: Email of user
-          type: string
-        profile_picture_url:
-          description: Profile picture url of user
-          type: string
-
-    UserPATCH:
-      description: This is the user model
-      type: object
-      properties:
-        name:
-          description: The name of user
-          type: string
-        email:
-          description: Email of user
-          type: string
-        profile_picture_url:
-          description: Profile picture url of user
-          type: string
-
-
-    BorrowGET:
+    BorrowDTO:
       description: This is the borrow model
       type: object
       properties:
@@ -401,9 +346,7 @@ components:
         owner_id:
           description: Id of user
           type: string
-
-
-    BorrowPOST:
+    BorrowForm:
       type: object
       properties:
         spotId:
@@ -419,8 +362,7 @@ components:
         - spotId
         - startDate
         - endDate
-
-    LendOfferGET:
+    LendOfferDTO:
       description: This is the lend offer model
       type: object
       properties:
@@ -441,8 +383,7 @@ components:
         owner_id:
           description: Id of user
           type: string
-
-    LendOfferPUT:
+    LendOfferPutForm:
       description: This is the lend offer put model
       type: object
       properties:
@@ -460,8 +401,11 @@ components:
         owner_id:
           description: Id of user
           type: string
-
-    LendOfferPOST:
+      required:
+        - start_date
+        - spot_id
+        - end_date
+    LendOfferPostForm:
       description: This is the lend offer model
       type: object
       properties:
@@ -476,8 +420,77 @@ components:
         spot_id:
           description: Id of parking spot
           type: string
-
-
+      required:
+        - start_date
+        - spot_id
+        - end_date
+    ParkingDTO:
+      description: This is the parking model (read-only)
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Unique parking identifier
+        organisation_id:
+          type: integer
+          format: int32
+          description: Id of the organisation (foreign key)
+        name:
+          type: string
+          description: The name of the parking
+        ui_object:
+          type: object
+          description: UI JSON data (arbitrary structure)
+      required:
+        - id
+        - organisation_id
+        - name
+        - ui_object
+    ParkingSpotDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Unique spot identifier
+        parking_id:
+          type: integer
+          format: int32
+          description: Id of the parent parking
+        spot_uuid:
+          type: string
+          format: uuid
+          description: UUID of the parking spot
+        owner_id:
+          type: string
+          format: uuid
+          description: Owner's user id (nullable if no owner)
+        status:
+          type: string
+          description: Status of the parking spot (optional)
+      required:
+        - id
+        - parking_id
+        - spot_uuid
+    LendOfferListDTO:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/LendOfferDTO'
+    BorrowListDTO:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/BorrowDTO'
     PagedResponse:
       description: Generic paginated response wrapper
       type: object
@@ -512,77 +525,3 @@ components:
         - totalPages
         - page
         - size
-
-    PagedLendOfferGETResponse:
-      allOf:
-        - $ref: '#/components/schemas/PagedResponse'
-        - type: object
-          properties:
-            content:
-              type: array
-              items:
-                $ref: '#/components/schemas/LendOfferGET'
-    PageBorrowGET:
-      allOf:
-        - $ref: '#/components/schemas/PagedResponse'
-        - type: object
-          properties:
-            content:
-              type: array
-              items:
-                $ref: '#/components/schemas/BorrowGET'
-
-
-
-
-    ParkingGET:
-      description: This is the parking model (read-only)
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-          description: Unique parking identifier
-        organisation_id:
-          type: integer
-          format: int32
-          description: Id of the organisation (foreign key)
-        name:
-          type: string
-          description: The name of the parking
-        ui_object:
-          type: object
-          description: UI JSON data (arbitrary structure)
-      required:
-        - id
-        - organisation_id
-        - name
-        - ui_object
-    ParkingSpotGET:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-          description: Unique spot identifier
-        parking_id:
-          type: integer
-          format: int32
-          description: Id of the parent parking
-        spot_uuid:
-          type: string
-          format: uuid
-          description: UUID of the parking spot
-        owner_id:
-          type: string
-          format: uuid
-          nullable: true
-          description: Owner's user id (nullable if no owner)
-        status:
-          type: string
-          description: Status of the parking spot (optional)
-      required:
-        - id
-        - parking_id
-        - spot_uuid
-

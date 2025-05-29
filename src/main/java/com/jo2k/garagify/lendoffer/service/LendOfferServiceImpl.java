@@ -1,8 +1,8 @@
 package com.jo2k.garagify.lendoffer.service;
 
 import com.jo2k.garagify.common.exception.ResourceNotFoundException;
-import com.jo2k.garagify.lendoffer.model.LendOffer;
-import com.jo2k.garagify.lendoffer.repository.LendOfferRepository;
+import com.jo2k.garagify.lendoffer.persistence.model.LendOffer;
+import com.jo2k.garagify.lendoffer.persistence.repository.LendOfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class LendOfferService implements ILendOfferService {
+public class LendOfferServiceImpl implements com.jo2k.garagify.lendoffer.api.LendOfferService {
 
     private final LendOfferRepository lendOfferRepository;
 

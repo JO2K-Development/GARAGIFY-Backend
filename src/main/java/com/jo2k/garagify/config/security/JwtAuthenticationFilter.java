@@ -38,7 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (jwtService.validateToken(token)) {
                 String userId = jwtService.getSubject(token);
-                AuthContext.setUserId(UUID.fromString(userId));
 
                 var authToken = new UsernamePasswordAuthenticationToken(userId, null, null);
                 SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -48,8 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            AuthContext.clear();
         }
     }
 }

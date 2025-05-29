@@ -1,8 +1,8 @@
 package com.jo2k.garagify.parking.controller;
 
 import com.jo2k.api.ParkingControllerApi;
-import com.jo2k.dto.ParkingGET;
-import com.jo2k.dto.ParkingSpotGET;
+import com.jo2k.dto.ParkingDTO;
+import com.jo2k.dto.ParkingSpotDTO;
 import com.jo2k.garagify.parking.api.ParkingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +17,15 @@ public class ParkingController implements ParkingControllerApi {
     private final ParkingService parkingService;
 
     @Override
-    public ResponseEntity<ParkingGET> getParking(@PathVariable("parking_id") Integer parkingId) {
-        ParkingGET parkingGET = parkingService.getParkingById(parkingId);
+    public ResponseEntity<ParkingDTO> getParking(@PathVariable("parking_id") Integer parkingId) {
+        ParkingDTO parkingGET = parkingService.getParkingById(parkingId);
         if (parkingGET == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(parkingGET);
     }
-
     @Override
-    public ResponseEntity<List<ParkingSpotGET>> getParkingSpots(@PathVariable("parking_id") Integer parkingId) {
+    public ResponseEntity<List<ParkingSpotDTO>> getParkingSpots(@PathVariable("parking_id") Integer parkingId) {
         return ResponseEntity.ok(parkingService.getParkingSpotsByParkingId(parkingId));
     }
 }

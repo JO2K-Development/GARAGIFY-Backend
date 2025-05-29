@@ -1,6 +1,6 @@
-package com.jo2k.garagify.lendoffer.repository;
+package com.jo2k.garagify.lendoffer.persistence.repository;
 
-import com.jo2k.garagify.lendoffer.model.LendOffer;
+import com.jo2k.garagify.lendoffer.persistence.model.LendOffer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;

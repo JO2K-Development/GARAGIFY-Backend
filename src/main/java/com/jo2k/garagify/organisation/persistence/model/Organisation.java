@@ -1,4 +1,4 @@
-package com.jo2k.garagify.organisation.persistance.model;
+package com.jo2k.garagify.organisation.persistence.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;

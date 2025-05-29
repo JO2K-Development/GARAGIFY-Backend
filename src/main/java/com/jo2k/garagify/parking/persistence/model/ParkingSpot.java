@@ -1,4 +1,4 @@
-package com.jo2k.garagify.parking.persistance.model;
+package com.jo2k.garagify.parking.persistence.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,10 +23,8 @@ public class ParkingSpot {
     private UUID spotUuid;
 
     @Column(name = "owner_id")
-    private UUID ownerId; // Make sure you have the users table mapped if you need relations
+    private UUID ownerId;
 
     @Column(length = 50)
     private String status;
-
-    // getters/setters/constructors
 }

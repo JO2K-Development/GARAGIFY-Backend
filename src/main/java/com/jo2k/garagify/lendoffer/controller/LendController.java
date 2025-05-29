@@ -1,13 +1,13 @@
 package com.jo2k.garagify.lendoffer.controller;
 
 import com.jo2k.api.LendOfferControllerApi;
-import com.jo2k.dto.LendOfferGET;
-import com.jo2k.dto.LendOfferPOST;
-import com.jo2k.dto.LendOfferPUT;
-import com.jo2k.dto.PagedLendOfferGETResponse;
+import com.jo2k.dto.LendOfferDTO;
+import com.jo2k.dto.LendOfferListDTO;
+import com.jo2k.dto.LendOfferPostForm;
+import com.jo2k.dto.LendOfferPutForm;
 import com.jo2k.garagify.lendoffer.mapper.LendOfferMapper;
-import com.jo2k.garagify.lendoffer.model.LendOffer;
-import com.jo2k.garagify.lendoffer.service.ILendOfferService;
+import com.jo2k.garagify.lendoffer.persistence.model.LendOffer;
+import com.jo2k.garagify.lendoffer.api.LendOfferService;
 import com.jo2k.garagify.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,12 +25,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LendController implements LendOfferControllerApi {
 
-    private final ILendOfferService lendOfferService;
+    private final LendOfferService lendOfferService;
     private final UserService userService;
     private final LendOfferMapper lendOfferMapper;
 
     @Override
-    public ResponseEntity<LendOfferGET> createLendOffer(@RequestBody LendOfferPOST lendOfferPOST) {
+    public ResponseEntity<LendOfferDTO> createLendOffer(@RequestBody LendOfferPostForm lendOfferPOST) {
         LendOffer lendOffer = lendOfferService.createLendOffer(
                 UUID.fromString(lendOfferPOST.getSpotId()),
                 userService.getCurrentUser().getId(),
@@ -38,7 +38,7 @@ public class LendController implements LendOfferControllerApi {
                 lendOfferPOST.getEndDate()
         );
 
-        LendOfferGET createdOffer = lendOfferMapper.toDto(lendOffer);
+        LendOfferDTO createdOffer = lendOfferMapper.toDto(lendOffer);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -50,7 +50,7 @@ public class LendController implements LendOfferControllerApi {
     }
 
     @Override
-    public ResponseEntity<PagedLendOfferGETResponse> getAllLendOffers(
+    public ResponseEntity<LendOfferListDTO> getAllLendOffers(
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime start_date,
@@ -66,9 +66,9 @@ public class LendController implements LendOfferControllerApi {
                 pageable
         );
 
-        Page<LendOfferGET> offers = offersPage.map(lendOfferMapper::toDto);
+        Page<LendOfferDTO> offers = offersPage.map(lendOfferMapper::toDto);
 
-        PagedLendOfferGETResponse response = new PagedLendOfferGETResponse(
+        LendOfferListDTO response = new LendOfferListDTO(
                 offers.getContent(),
                 offers.getTotalElements(),
                 offers.getTotalPages(),
@@ -80,23 +80,23 @@ public class LendController implements LendOfferControllerApi {
     }
 
     @Override
-    public ResponseEntity<LendOfferGET> getLendOfferById(@PathVariable("lend_offer_id") String lendOfferId) {
+    public ResponseEntity<LendOfferDTO> getLendOfferById(@PathVariable("lend_offer_id") String lendOfferId) {
         LendOffer lendOffer = lendOfferService.getLendOfferById(UUID.fromString(lendOfferId));
-        LendOfferGET dto = lendOfferMapper.toDto(lendOffer);
+        LendOfferDTO dto = lendOfferMapper.toDto(lendOffer);
         return ResponseEntity.ok(dto);
     }
 
     @Override
-    public ResponseEntity<LendOfferGET> updateLendOfferById(
+    public ResponseEntity<LendOfferDTO> updateLendOfferById(
             @PathVariable("lend_offer_id") String lendOfferId,
-            @RequestBody LendOfferPUT lendOfferPUT) {
+            @RequestBody LendOfferPutForm lendOfferPUT) {
 
         LendOffer updatedLendOffer = lendOfferService.updateLendOffer(
                 UUID.fromString(lendOfferId),
                 lendOfferPUT.getStartDate(),
                 lendOfferPUT.getEndDate()
         );
-        LendOfferGET dto = lendOfferMapper.toDto(updatedLendOffer);
+        LendOfferDTO dto = lendOfferMapper.toDto(updatedLendOffer);
         return ResponseEntity.ok(dto);
     }
 
