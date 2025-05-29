@@ -2,8 +2,12 @@ package com.jo2k.garagify.parking.persistance.model;
 
 import com.jo2k.garagify.organisation.persistance.model.Organisation;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "parking")
 public class Parking {
     @Id

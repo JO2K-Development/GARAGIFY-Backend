@@ -1,10 +1,14 @@
 package com.jo2k.garagify.parking.persistance.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "parking_spot", uniqueConstraints = @UniqueConstraint(columnNames = {"parking_id", "spot_uuid"}))
 public class ParkingSpot {
     @Id
