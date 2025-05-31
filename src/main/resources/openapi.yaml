@@ -6,13 +6,9 @@ info:
 tags:
   - name: AuthController
     description: Handles Google token authentication and JWT refresh operations
-  - name: ParkingSpotsController
-  - name: OrganizationController
-    description: Handles organization-related operations, including fetching parkings and organizations by owner id
   - name: BorrowController
   - name: LendOfferController
     description: Handles lend offers and borrows, including creation and retrieval by filters
-  - name: UserController
   - name: ParkingController
 paths:
   /api/v1/auth/access:
@@ -74,27 +70,147 @@ paths:
                 $ref: '#/components/schemas/ParkingDTO'
         404:
           description: Not found
-  /api/v1/parkings/{parking_id}/spots:
+  /api/v1/parkings/{parking_id}/lend/available-timeranges:
     get:
-      operationId: getParkingSpots
-      summary: Get all spots for given parking
       tags:
         - ParkingController
+      summary: Get available time ranges for lending a parking spot
+      description: Returns an array of available time ranges during which a parking spot can be lent up to the given date.
+      operationId: getAvailableLendTimeRanges
       parameters:
         - in: path
           name: parking_id
           required: true
           schema:
             type: integer
+        - in: query
+          name: untilWhen
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2025-06-01T23:59:00+02:00'
+          description: Date (inclusive) until when the parking spot can be lent.
       responses:
-        200:
-          description: Success
+        '200':
+          description: Array of available time ranges
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ParkingSpotDTO'
+                  $ref: '#/components/schemas/TimeRangeDto'
+
+  /api/v1/parkings/{parking_id}/lend/available-spots:
+    get:
+      tags:
+        - ParkingController
+      summary: Get available parking spot UUIDs for lending in a given time range
+      description: Returns a list of spot UUIDs that are available to lend for the entire given time range.
+      operationId: getAvailableLendSpots
+      parameters:
+        - in: path
+          name: parking_id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: from
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2025-06-01T09:00:00+02:00'
+          description: Start of the time range (with offset)
+        - in: query
+          name: until
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2025-06-01T18:00:00+02:00'
+          description: End of the time range (with offset)
+      responses:
+        '200':
+          description: List of available spot UUIDs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+
+  /api/v1/parkings/{parking_id}/borrow/available-timeranges:
+    get:
+      tags:
+        - ParkingController
+      summary: Get available time ranges for borrowing a parking spot
+      description: Returns an array of available time ranges during which a parking spot can be borrowed up to the given date.
+      operationId: getAvailableBorrowTimeRanges
+      parameters:
+        - in: path
+          name: parking_id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: untilWhen
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2025-06-01'
+          description: Date (inclusive) until when the parking spot can be borrowed.
+      responses:
+        '200':
+          description: Array of available time ranges
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimeRangeDto'
+  /api/v1/parkings/{parking_id}/borrow/available-spots:
+    get:
+      tags:
+        - ParkingController
+      summary: Get available parking spot UUIDs for a given time range
+      description: Returns a list of spot UUIDs that are available for the entire given time range.
+      operationId: getAvailableBorrowSpots
+      parameters:
+        - in: path
+          name: parking_id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: from
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2025-06-01T09:00:00+02:00'
+          description: Start of the time range (with offset)
+        - in: query
+          name: until
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2025-06-01T18:00:00+02:00'
+          description: End of the time range (with offset)
+      responses:
+        '200':
+          description: List of available spot UUIDs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+
   /api/v1/borrow:
     post:
       summary: Borrow a parking spot
@@ -473,6 +589,21 @@ components:
         - id
         - parking_id
         - spot_uuid
+    TimeRangeDto:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+          example: '2025-06-01T08:00:00'
+        end:
+          type: string
+          format: date-time
+          example: '2025-06-01T12:00:00'
+      required:
+        - start
+        - end
+
     LendOfferListDTO:
       allOf:
         - $ref: '#/components/schemas/PagedResponse'
