@@ -1,9 +1,9 @@
 package com.jo2k.garagify.parking.controller;
 
-import com.jo2k.api.BorrowApi;
-import com.jo2k.dto.BorrowDTO;
-import com.jo2k.dto.BorrowListDTO;
-import com.jo2k.garagify.parking.api.ParkingBorrowService;
+import com.jo2k.api.LendApi;
+import com.jo2k.dto.LendOfferDTO;
+import com.jo2k.dto.LendOfferListDTO;
+import com.jo2k.garagify.parking.api.ParkingLendService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,37 +19,37 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-public class BorrowController implements BorrowApi {
+public class LendController implements LendApi {
 
-    private final ParkingBorrowService parkingBorrowService;
+    private final ParkingLendService parkingLendService;
 
     @Override
-    public ResponseEntity<Void> deleteParkingBorrow(@PathVariable("id") UUID id) {
-        parkingBorrowService.deleteBorrowById(id);
+    public ResponseEntity<Void> deleteParkingLend(@PathVariable("id") UUID id) {
+        parkingLendService.deleteLendOfferById(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<BorrowListDTO> getMyBorrows(
+    public ResponseEntity<LendOfferListDTO> getMyLends(
             @Valid @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @Valid @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
             @Valid @RequestParam(value = "sort", required = false) String sort
     ) {
         Sort sortOrder = (sort != null && !sort.isBlank())
                 ? Sort.by(sort).ascending()
-                : Sort.by("borrowTime").ascending();
+                : Sort.by("startDate").ascending();
 
         Pageable pageable = PageRequest.of(page, size, sortOrder);
 
-        Page<BorrowDTO> result = parkingBorrowService.getBorrowsForCurrentUser(pageable);
+        Page<LendOfferDTO> result = parkingLendService.getLendsForCurrentUser(pageable);
 
-        BorrowListDTO dto = toDto(result);
+        LendOfferListDTO dto = toDto(result);
 
         return ResponseEntity.ok(dto);
     }
 
-    private static BorrowListDTO toDto(Page<BorrowDTO> page) {
-        BorrowListDTO dto = new BorrowListDTO();
+    private static LendOfferListDTO toDto(Page<LendOfferDTO> page) {
+        LendOfferListDTO dto = new LendOfferListDTO();
         dto.setContent(page.getContent());
         dto.setTotalElements((long) page.getTotalElements()); // or cast to long if needed
         dto.setTotalPages(page.getTotalPages());

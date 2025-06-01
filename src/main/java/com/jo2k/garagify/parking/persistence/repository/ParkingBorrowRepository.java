@@ -1,6 +1,7 @@
 package com.jo2k.garagify.parking.persistence.repository;
 
 import com.jo2k.garagify.parking.persistence.model.ParkingBorrow;
+import com.jo2k.garagify.user.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,6 +31,6 @@ public interface ParkingBorrowRepository extends JpaRepository<ParkingBorrow, UU
 
 
 
-    Page<ParkingBorrow> findAllByUserId(UUID userId, Pageable pageable);
+    Page<ParkingBorrow> findAllByUser(User user, Pageable pageable);
 
 }

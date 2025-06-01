@@ -2,12 +2,12 @@ package com.jo2k.garagify.parking.service;
 
 import com.jo2k.dto.ParkingSpotDTO;
 import com.jo2k.dto.TimeRangeDto;
-import com.jo2k.garagify.lendoffer.persistence.model.LendOffer;
-import com.jo2k.garagify.lendoffer.persistence.repository.LendOfferRepository;
 import com.jo2k.garagify.parking.api.ParkingAvailability;
 import com.jo2k.garagify.parking.api.ParkingService;
 import com.jo2k.garagify.parking.mapper.TimeRangeMapper;
+import com.jo2k.garagify.parking.persistence.model.ParkingLend;
 import com.jo2k.garagify.parking.persistence.repository.ParkingBorrowRepository;
+import com.jo2k.garagify.parking.persistence.repository.ParkingLendRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AvailabilityBorrowServiceImpl implements ParkingAvailability {
 
-    private final LendOfferRepository lendOfferRepository;
+    private final ParkingLendRepository parkingLendRepository;
     private final ParkingBorrowRepository borrowRepository;
     private final ParkingService parkingService;
     private final TimeRangeMapper timeRangeMapper;
@@ -30,8 +30,8 @@ public class AvailabilityBorrowServiceImpl implements ParkingAvailability {
         List<TimeRangeDto> result = new ArrayList<>();
         for (var spot : spots) {
             UUID spotUuid = spot.getSpotUuid();
-            List<LendOffer> offers = getLendOffersUntil(spotUuid, untilWhen);
-            for (LendOffer offer : offers) {
+            List<ParkingLend> offers = getLendOffersUntil(parkingId, spotUuid, untilWhen);
+            for (ParkingLend offer : offers) {
                 if (isNotBorrowed(parkingId, spotUuid, offer.getStartDate(), clampEnd(offer.getEndDate(), untilWhen))) {
                     result.add(timeRangeMapper.toDto(offer.getStartDate(), clampEnd(offer.getEndDate(), untilWhen)));
                 }
@@ -47,7 +47,7 @@ public class AvailabilityBorrowServiceImpl implements ParkingAvailability {
         List<UUID> result = new ArrayList<>();
         for (var spot : spots) {
             UUID spotUuid = spot.getSpotUuid();
-            if (hasLendOfferInRange(spotUuid, from, until) && isNotBorrowed(parkingId, spotUuid, from, until)) {
+            if (hasLendOfferInRange(parkingId, spotUuid, from, until) && isNotBorrowed(parkingId, spotUuid, from, until)) {
                 result.add(spotUuid);
             }
         }
@@ -55,16 +55,19 @@ public class AvailabilityBorrowServiceImpl implements ParkingAvailability {
     }
 
 
-    private List<LendOffer> getLendOffersUntil(UUID spotUuid, OffsetDateTime untilWhen) {
-        return lendOfferRepository.findByParkingSpotId(spotUuid).stream()
+    private List<ParkingLend> getLendOffersUntil(Integer parkingId, UUID spotUuid, OffsetDateTime untilWhen) {
+        return parkingLendRepository.findByParkingSpot_Parking_IdAndParkingSpot_SpotUuid(parkingId, spotUuid)
+                .stream()
                 .filter(lo -> !lo.getStartDate().isAfter(untilWhen))
                 .collect(Collectors.toList());
     }
 
-    private boolean hasLendOfferInRange(UUID spotUuid, OffsetDateTime from, OffsetDateTime until) {
-        return lendOfferRepository.findByParkingSpotId(spotUuid).stream()
+    private boolean hasLendOfferInRange(Integer parkingId, UUID spotUuid, OffsetDateTime from, OffsetDateTime until) {
+        return parkingLendRepository.findByParkingSpot_Parking_IdAndParkingSpot_SpotUuid(parkingId, spotUuid)
+                .stream()
                 .anyMatch(lo -> !lo.getStartDate().isAfter(from) && !lo.getEndDate().isBefore(until));
     }
+
 
     private boolean isNotBorrowed(Integer parkingId, UUID spotUuid, OffsetDateTime start, OffsetDateTime end) {
         return !borrowRepository.existsOverlap(parkingId, spotUuid, start, end);

@@ -2,9 +2,10 @@ package com.jo2k.garagify.parking.service;
 
 import com.jo2k.dto.TimeRangeDto;
 import com.jo2k.garagify.lendoffer.persistence.model.LendOffer;
-import com.jo2k.garagify.lendoffer.persistence.repository.LendOfferRepository;
 import com.jo2k.garagify.parking.api.ParkingAvailability;
 import com.jo2k.garagify.parking.api.ParkingService;
+import com.jo2k.garagify.parking.persistence.model.ParkingLend;
+import com.jo2k.garagify.parking.persistence.repository.ParkingLendRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ import java.util.*;
 @Service("availabilityLendService")
 @RequiredArgsConstructor
 public class AvailabilityLendServiceImpl implements ParkingAvailability {
-    private final LendOfferRepository lendOfferRepository;
+    private final ParkingLendRepository parkingLendRepository;
     private final ParkingService parkingService;
 
     @Override
@@ -26,7 +27,7 @@ public class AvailabilityLendServiceImpl implements ParkingAvailability {
 
         for (var spot : spots) {
             UUID spotUuid = spot.getSpotUuid();
-            List<LendOffer> offers = getSortedLendOffers(spotUuid);
+            List<ParkingLend> offers = getSortedLendOffers(parkingId, spotUuid);
             allFree.addAll(getFreeTimeRangesForSpot(now, untilWhen, offers));
         }
         return mergeTimeRanges(allFree);
@@ -39,26 +40,27 @@ public class AvailabilityLendServiceImpl implements ParkingAvailability {
 
         for (var spot : spots) {
             UUID spotUuid = spot.getSpotUuid();
-            if (isSpotFreeForLend(spotUuid, from, until)) {
+            if (isSpotFreeForLend(parkingId, spotUuid, from, until)) {
                 result.add(spotUuid);
             }
         }
         return result;
     }
 
-    private List<LendOffer> getSortedLendOffers(UUID spotUuid) {
-        List<LendOffer> offers = lendOfferRepository.findByParkingSpotId(spotUuid);
-        offers.sort(Comparator.comparing(LendOffer::getStartDate));
+    private List<ParkingLend> getSortedLendOffers(Integer parkingId, UUID spotUuid) {
+        List<ParkingLend> offers = parkingLendRepository.findByParkingSpot_Parking_IdAndParkingSpot_SpotUuid(parkingId, spotUuid);
+        offers.sort(Comparator.comparing(ParkingLend::getStartDate));
         return offers;
     }
 
+
     private List<TimeRangeDto> getFreeTimeRangesForSpot(
-            OffsetDateTime from, OffsetDateTime untilWhen, List<LendOffer> offers) {
+            OffsetDateTime from, OffsetDateTime untilWhen, List<ParkingLend> offers) {
 
         List<TimeRangeDto> freeSlots = new ArrayList<>();
         OffsetDateTime windowStart = from;
 
-        for (LendOffer offer : offers) {
+        for (ParkingLend offer : offers) {
             if (windowStart.isBefore(offer.getStartDate())) {
                 freeSlots.add(new TimeRangeDto(windowStart, offer.getStartDate()));
             }
@@ -70,11 +72,12 @@ public class AvailabilityLendServiceImpl implements ParkingAvailability {
         return freeSlots;
     }
 
-    private boolean isSpotFreeForLend(UUID spotUuid, OffsetDateTime from, OffsetDateTime until) {
-        return lendOfferRepository.findByParkingSpotId(spotUuid)
+    private boolean isSpotFreeForLend(Integer parkingId, UUID spotUuid, OffsetDateTime from, OffsetDateTime until) {
+        return parkingLendRepository.findByParkingSpot_Parking_IdAndParkingSpot_SpotUuid(parkingId, spotUuid)
                 .stream()
                 .noneMatch(lo -> from.isBefore(lo.getEndDate()) && until.isAfter(lo.getStartDate()));
     }
+
 
     private List<TimeRangeDto> mergeTimeRanges(List<TimeRangeDto> ranges) {
         if (ranges.isEmpty()) return Collections.emptyList();

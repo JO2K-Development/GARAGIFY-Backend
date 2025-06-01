@@ -10,6 +10,7 @@ import com.jo2k.garagify.parking.persistence.model.ParkingBorrow;
 import com.jo2k.garagify.parking.persistence.model.ParkingSpot;
 import com.jo2k.garagify.parking.persistence.repository.ParkingBorrowRepository;
 import com.jo2k.garagify.parking.persistence.repository.ParkingSpotRepository;
+import com.jo2k.garagify.user.model.User;
 import com.jo2k.garagify.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class ParkingBorrowServiceImpl implements ParkingBorrowService {
 
     @Override
     public BorrowDTO createBorrowForSpot(Integer parkingId, UUID spotUuid, TimeRangeRequest timeRange) {
-        UUID currentUserId = userService.getCurrentUser().getId();
+        User currentUser = userService.getCurrentUser();
 
         ParkingSpot spot = parkingSpotRepository.findByParking_IdAndSpotUuid(parkingId, spotUuid)
                 .orElseThrow(() -> new InvalidBorrowException("Parking spot not found"));
@@ -44,18 +45,20 @@ public class ParkingBorrowServiceImpl implements ParkingBorrowService {
         ParkingBorrow borrow = ParkingBorrow.builder()
                 .borrowTime(timeRange.getFromWhen())
                 .returnTime(timeRange.getUntilWhen())
-                .userId(currentUserId)
+                .user(currentUser)
                 .parkingSpot(spot)
                 .build();
         parkingBorrowRepository.save(borrow);
         return parkingBorrowMapper.toDTO(borrow);
     }
+
     @Override
     public Page<BorrowDTO> getBorrowsForCurrentUser(Pageable pageable) {
-        UUID userId = userService.getCurrentUser().getId();
-        return parkingBorrowRepository.findAllByUserId(userId, pageable)
+        User currentUser = userService.getCurrentUser();
+        return parkingBorrowRepository.findAllByUser(currentUser, pageable)
                 .map(parkingBorrowMapper::toDTO);
     }
+
     @Transactional
     public void deleteBorrowById(UUID id) {
         if (!parkingBorrowRepository.existsById(id)) {

@@ -4,17 +4,22 @@ info:
   version: 1.0.0
   description: API
 tags:
-  - name: AuthController
-    description: Handles Google token authentication and JWT refresh operations
-  - name: BorrowController
+  - name: Authorization
+    description: Operations related to user authentication and authorization
+  - name: Lend
+    description: Lend out parking spots
+  - name: Borrow
+    description: Borrow a parking spot
+  - name: Parking
+    description: Parking and spot management
   - name: LendOfferController
-    description: Handles lend offers and borrows, including creation and retrieval by filters
-  - name: ParkingController
+    description: Legacy controller for lend offers
+
 paths:
   /api/v1/auth/access:
     post:
       tags:
-        - AuthController
+        - Authorization
       summary: Authenticate using a Google token
       operationId: authenticateWithGoogle
       requestBody:
@@ -33,7 +38,7 @@ paths:
   /api/v1/auth/refresh:
     post:
       tags:
-        - AuthController
+        - Authorization
       summary: Refresh JWT token
       operationId: refreshToken
       requestBody:
@@ -49,12 +54,106 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenDto'
+  /api/v1/lend/mine:
+    get:
+      operationId: getMyLends
+      summary: Get all borrows for the current user (paged)
+      tags:
+        - Lend
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Page number (0-based)
+        - in: query
+          name: size
+          schema:
+            type: integer
+          description: Page size
+        - in: query
+          name: sort
+          schema:
+            type: string
+          description: Sort order (e.g., borrowTime,asc)
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LendOfferListDTO'
+  /api/v1/lend/{id}:
+    delete:
+      tags:
+        - Lend
+      summary: Delete a borrow by its ID
+      description: Deletes the lend resource with the given UUID.
+      operationId: deleteParkingLend
+      parameters:
+        - name: id
+          in: path
+          description: UUID of the lend to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Borrow deleted successfully, no content returned
+  /api/v1/borrow/mine:
+    get:
+      operationId: getMyBorrows
+      summary: Get all borrows for the current user (paged)
+      tags:
+        - Borrow
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Page number (0-based)
+        - in: query
+          name: size
+          schema:
+            type: integer
+          description: Page size
+        - in: query
+          name: sort
+          schema:
+            type: string
+          description: Sort order (e.g., borrowTime,asc)
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BorrowListDTO'
+  /api/v1/borrow/{id}:
+    delete:
+      tags:
+        - Borrow
+      summary: Delete a borrow by its ID
+      description: Deletes the borrow resource with the given UUID.
+      operationId: deleteParkingBorrow
+      parameters:
+        - name: id
+          in: path
+          description: UUID of the borrow to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Borrow deleted successfully, no content returned
   /api/v1/parkings/{parking_id}:
     get:
       operationId: getParking
       summary: Get parking by id
       tags:
-        - ParkingController
+        - Parking
       parameters:
         - in: path
           name: parking_id
@@ -73,7 +172,7 @@ paths:
   /api/v1/parkings/{parking_id}/lend/available-timeranges:
     get:
       tags:
-        - ParkingController
+        - Parking
       summary: Get available time ranges for lending a parking spot
       description: Returns an array of available time ranges during which a parking spot can be lent up to the given date.
       operationId: getAvailableLendTimeRanges
@@ -104,7 +203,7 @@ paths:
   /api/v1/parkings/{parking_id}/lend/available-spots:
     get:
       tags:
-        - ParkingController
+        - Parking
       summary: Get available parking spot UUIDs for lending in a given time range
       description: Returns a list of spot UUIDs that are available to lend for the entire given time range.
       operationId: getAvailableLendSpots
@@ -140,11 +239,41 @@ paths:
                 items:
                   type: string
                   format: uuid
-
+  /api/v1/parkings/{parking_id}/lend/{spot_id}:
+    post:
+      summary: Borrow a specific parking spot
+      tags:
+        - Parking
+      operationId: createLendForSpot
+      parameters:
+        - name: parking_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: spot_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeRangeRequest'
+      responses:
+        '201':
+          description: Borrow created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LendOfferDTO'
   /api/v1/parkings/{parking_id}/borrow/available-timeranges:
     get:
       tags:
-        - ParkingController
+        - Parking
       summary: Get available time ranges for borrowing a parking spot
       description: Returns an array of available time ranges during which a parking spot can be borrowed up to the given date.
       operationId: getAvailableBorrowTimeRanges
@@ -174,7 +303,7 @@ paths:
   /api/v1/parkings/{parking_id}/borrow/available-spots:
     get:
       tags:
-        - ParkingController
+        - Parking
       summary: Get available parking spot UUIDs for a given time range
       description: Returns a list of spot UUIDs that are available for the entire given time range.
       operationId: getAvailableBorrowSpots
@@ -214,7 +343,7 @@ paths:
     post:
       summary: Borrow a specific parking spot
       tags:
-        - ParkingController
+        - Parking
       operationId: createBorrowForSpot
       parameters:
         - name: parking_id
@@ -241,53 +370,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BorrowDTO'
-  /api/v1/borrow/{id}:
-    delete:
-      tags:
-        - BorrowController
-      summary: Delete a borrow by its ID
-      description: Deletes the borrow resource with the given UUID.
-      operationId: deleteParkingBorrow
-      parameters:
-        - name: id
-          in: path
-          description: UUID of the borrow to delete
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: Borrow deleted successfully, no content returned
-  /api/v1/borrow/mine:
-    get:
-      operationId: getMyBorrows
-      summary: Get all borrows for the current user (paged)
-      tags:
-        - BorrowController
-      parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-          description: Page number (0-based)
-        - in: query
-          name: size
-          schema:
-            type: integer
-          description: Page size
-        - in: query
-          name: sort
-          schema:
-            type: string
-          description: Sort order (e.g., borrowTime,asc)
-      responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BorrowListDTO'
 
   /api/v1/lend-offer:
     post:
@@ -512,6 +594,9 @@ components:
           description: End date of lend offer
           type: string
           format: date-time
+        parking_id:
+          description: Id of the parking
+          type: integer
         spot_id:
           description: Id of parking spot
           type: string
