@@ -10,6 +10,5 @@ public interface LendOfferMapper {
 
     @Mapping(target = "id", expression = "java(String.valueOf(lendOffer.getId()))")
     @Mapping(target = "spotId", expression = "java(String.valueOf(lendOffer.getParkingSpotId()))")
-    @Mapping(target = "ownerId", expression = "java(String.valueOf(lendOffer.getOwnerId()))")
     LendOfferDTO toDto(LendOffer lendOffer);
 }

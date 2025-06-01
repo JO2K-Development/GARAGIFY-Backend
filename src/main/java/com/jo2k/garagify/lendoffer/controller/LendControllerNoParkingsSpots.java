@@ -23,7 +23,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-public class LendController implements LendOfferControllerApi {
+public class LendControllerNoParkingsSpots implements LendOfferControllerApi {
 
     private final LendOfferService lendOfferService;
     private final UserService userService;

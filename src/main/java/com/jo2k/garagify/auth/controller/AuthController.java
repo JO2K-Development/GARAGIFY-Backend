@@ -1,6 +1,6 @@
 package com.jo2k.garagify.auth.controller;
 
-import com.jo2k.api.AuthControllerApi;
+import com.jo2k.api.AuthorizationApi;
 import com.jo2k.dto.TokenDto;
 import com.jo2k.dto.TokenVerificationForm;
 import com.jo2k.garagify.auth.service.AuthService;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-class AuthController implements AuthControllerApi {
+class AuthController implements AuthorizationApi {
 
     private final GoogleTokenVerifierService tokenVerifierService;
     private final AuthService authService;

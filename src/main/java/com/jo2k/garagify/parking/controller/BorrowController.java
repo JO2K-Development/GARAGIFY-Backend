@@ -1,55 +1,61 @@
-package com.jo2k.garagify.borrow.controller;
+package com.jo2k.garagify.parking.controller;
 
-import com.jo2k.api.BorrowControllerApi;
-import com.jo2k.dto.*;
-import com.jo2k.garagify.borrow.api.BorrowService;
+import com.jo2k.api.BorrowApi;
+import com.jo2k.dto.BorrowDTO;
+import com.jo2k.dto.BorrowListDTO;
+import com.jo2k.dto.TimeRangeRequest;
+import com.jo2k.garagify.parking.api.ParkingActionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-@Validated
-@RequiredArgsConstructor
 @RestController
-public class BorrowController implements BorrowControllerApi {
+@RequiredArgsConstructor
+public class BorrowController implements BorrowApi {
 
-    private final BorrowService borrowService;
+    private final ParkingActionService<BorrowDTO> parkingBorrowService;
 
     @Override
-    public ResponseEntity<List<BorrowDTO>> createBorrow(@Valid @RequestBody List<@Valid BorrowForm> borrowPOSTs) {
-        List<BorrowDTO> result = borrowService.createBorrow(borrowPOSTs);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    public ResponseEntity<BorrowDTO> createBorrowForSpot(
+            @PathVariable("parking_id") Integer parkingId,
+            @PathVariable("spot_id") UUID spotId,
+            @RequestBody TimeRangeRequest body) {
+        return ResponseEntity.ok(parkingBorrowService.create(parkingId, spotId, body));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteParkingBorrow(@PathVariable("id") UUID id) {
+        parkingBorrowService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<BorrowListDTO> getMyBorrows(
             @Valid @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @Valid @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
-            @Valid @RequestParam(value = "sort", required = false) String sort) {
+            @Valid @RequestParam(value = "sort", required = false) String sort
+    ) {
+        Sort sortOrder = (sort != null && !sort.isBlank())
+                ? Sort.by(sort).ascending()
+                : Sort.by("borrowTime").ascending();
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Optional.ofNullable(sort).orElse("borrowTime")).ascending());
-        Page<BorrowDTO> result = borrowService.getBorrowsForCurrentUser(pageable);
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+
+        Page<BorrowDTO> result = parkingBorrowService.getForCurrentUser(pageable);
+
         BorrowListDTO dto = toDto(result);
-        return ResponseEntity.ok(dto);
-    }
 
-    @Override
-    public ResponseEntity<Void> deleteBorrow(@PathVariable UUID id) {
-        borrowService.deleteBorrowById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(dto);
     }
 
     private static BorrowListDTO toDto(Page<BorrowDTO> page) {
