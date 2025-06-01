@@ -1,4 +1,4 @@
-package com.jo2k.garagify.borrow.persistence.model;
+package com.jo2k.garagify.parking.persistence.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,13 +7,12 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "borrows")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "parking_borrows")
+@Getter @Setter
 @Builder
-public class Borrow {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ParkingBorrow {
 
     @Id
     @GeneratedValue
@@ -25,13 +24,14 @@ public class Borrow {
     @Column(name = "return_time")
     private OffsetDateTime returnTime;
 
-    @Column(name = "parking_spot_id", nullable = false)
-    private UUID parkingSpotId;
-
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "created_at", updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parking_spot_id", nullable = false)
+    private ParkingSpot parkingSpot;
+
+    @Column(name = "created_at", updatable = false, insertable = false)
     private OffsetDateTime createdAt;
 
     @PrePersist
@@ -39,3 +39,4 @@ public class Borrow {
         this.createdAt = OffsetDateTime.now();
     }
 }
+

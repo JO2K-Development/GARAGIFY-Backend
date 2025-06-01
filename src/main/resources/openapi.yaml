@@ -210,33 +210,55 @@ paths:
                 items:
                   type: string
                   format: uuid
-
-  /api/v1/borrow:
+  /api/v1/parkings/{parking_id}/borrow/{spot_id}:
     post:
-      summary: Borrow a parking spot
+      summary: Borrow a specific parking spot
       tags:
-        - BorrowController
-      description: This is a description
-      operationId: createBorrow
+        - ParkingController
+      operationId: createBorrowForSpot
+      parameters:
+        - name: parking_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: spot_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/BorrowForm'
+              $ref: '#/components/schemas/TimeRangeRequest'
       responses:
         '201':
-          description: Created
+          description: Borrow created
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BorrowDTO'
-        '400':
-          description: Bad request
+                $ref: '#/components/schemas/BorrowDTO'
+  /api/v1/borrow/{id}:
+    delete:
+      tags:
+        - BorrowController
+      summary: Delete a borrow by its ID
+      description: Deletes the borrow resource with the given UUID.
+      operationId: deleteParkingBorrow
+      parameters:
+        - name: id
+          in: path
+          description: UUID of the borrow to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Borrow deleted successfully, no content returned
   /api/v1/borrow/mine:
     get:
       operationId: getMyBorrows
@@ -266,24 +288,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BorrowListDTO'
-  /api/v1/borrow/{id}:
-    delete:
-      tags:
-        - BorrowController
-      summary: Delete a borrow by its ID
-      description: Deletes the borrow resource with the given UUID.
-      operationId: deleteBorrow
-      parameters:
-        - name: id
-          in: path
-          description: UUID of the borrow to delete
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: Borrow deleted successfully, no content returned
+
   /api/v1/lend-offer:
     post:
       summary: Create a lend offer
@@ -421,6 +426,20 @@ paths:
           description: This means its ok
 components:
   schemas:
+    TimeRangeRequest:
+      type: object
+      properties:
+        fromWhen:
+          type: string
+          format: date-time
+          example: "2025-06-01T08:00:00+02:00"
+        untilWhen:
+          type: string
+          format: date-time
+          example: "2025-06-01T10:00:00+02:00"
+      required:
+        - fromWhen
+        - untilWhen
     TokenVerificationForm:
       type: object
       properties:
@@ -445,6 +464,15 @@ components:
         id:
           description: Id of borrow
           type: string
+        parking_id:
+          description: Id of the parking
+          type: integer
+        spot_id:
+          description: Id of parking spot
+          type: string
+        borrower_id:
+          description: Id of user
+          type: string
         start_date:
           description: Start date of borrow
           type: string
@@ -453,15 +481,6 @@ components:
           description: End date of borrow
           type: string
           format: date-time
-        spot_id:
-          description: Id of parking spot
-          type: string
-        borrower_id:
-          description: Id of user
-          type: string
-        owner_id:
-          description: Id of user
-          type: string
     BorrowForm:
       type: object
       properties:

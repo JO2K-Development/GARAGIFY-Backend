@@ -1,8 +1,8 @@
-package com.jo2k.garagify.borrow.mapper;
+package com.jo2k.garagify.parking.mapper;
 
 import com.jo2k.dto.BorrowDTO;
 import com.jo2k.dto.BorrowForm;
-import com.jo2k.garagify.borrow.persistence.model.Borrow;
+import com.jo2k.garagify.parking.persistence.model.ParkingBorrow;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -10,21 +10,23 @@ import org.mapstruct.Mapping;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")
-public interface BorrowMapper {
+public interface ParkingBorrowMapper {
 
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "parkingSpotId", target = "spotId")
+    @Mapping(source = "parkingSpot.parking.id", target = "parkingId")
+    @Mapping(source = "parkingSpot.spotUuid", target = "spotId")
     @Mapping(source = "userId", target = "borrowerId")
     @Mapping(source = "borrowTime", target = "startDate")
     @Mapping(source = "returnTime", target = "endDate")
-    BorrowDTO toDTO(Borrow borrow);
+    BorrowDTO toDTO(ParkingBorrow borrow);
 
 
-    @Mapping(target = "id", ignore = true) // or just don't mention it
-    @Mapping(target = "parkingSpotId", source = "spotId")
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "userId", expression = "java(userId)")
     @Mapping(target = "borrowTime", source = "startDate")
     @Mapping(target = "returnTime", source = "endDate")
     @Mapping(target = "createdAt", ignore = true)
-    Borrow toEntity(BorrowForm dto, @Context UUID userId);
+    @Mapping(target = "parkingSpot", ignore = true)
+    ParkingBorrow toEntity(BorrowForm dto, @Context UUID userId);
+
 }
