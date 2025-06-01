@@ -2,9 +2,7 @@ package com.jo2k.garagify.parking.controller;
 
 import com.jo2k.api.ParkingApi;
 import com.jo2k.dto.*;
-import com.jo2k.garagify.parking.api.ParkingAvailability;
-import com.jo2k.garagify.parking.api.ParkingBorrowService;
-import com.jo2k.garagify.parking.api.ParkingLendService;
+import com.jo2k.garagify.parking.api.ParkingAvailabilityService;
 import com.jo2k.garagify.parking.api.ParkingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +18,8 @@ import java.util.UUID;
 public class ParkingController implements ParkingApi {
 
     private final ParkingService parkingService;
-    private final ParkingAvailability availabilityBorrowService;
-    private final ParkingAvailability availabilityLendService;
-    private final ParkingBorrowService parkingBorrowService;
-    private final ParkingLendService parkingLendService;
+    private final ParkingAvailabilityService availabilityBorrowService;
+    private final ParkingAvailabilityService availabilityLendService;
 
     @Override
     public ResponseEntity<ParkingDTO> getParking(@PathVariable("parking_id") Integer parkingId) {
@@ -64,19 +60,4 @@ public class ParkingController implements ParkingApi {
         return ResponseEntity.ok(availabilityBorrowService.getSpots(parkingId, from,until));
     }
 
-    @Override
-    public ResponseEntity<BorrowDTO> createBorrowForSpot(
-            @PathVariable("parking_id") Integer parkingId,
-            @PathVariable("spot_id") UUID spotId,
-            @RequestBody TimeRangeRequest body) {
-        return ResponseEntity.ok(parkingBorrowService.createBorrowForSpot(parkingId, spotId, body));
-    }
-
-    @Override
-    public ResponseEntity<LendOfferDTO> createLendForSpot(
-            @PathVariable("parking_id") Integer parkingId,
-            @PathVariable("spot_id") UUID spotId,
-            @RequestBody TimeRangeRequest body) {
-        return ResponseEntity.ok(parkingLendService.createLendOfferForSpot(parkingId, spotId, body));
-    }
 }

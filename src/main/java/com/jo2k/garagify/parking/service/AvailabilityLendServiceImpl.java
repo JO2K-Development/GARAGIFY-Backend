@@ -1,8 +1,7 @@
 package com.jo2k.garagify.parking.service;
 
 import com.jo2k.dto.TimeRangeDto;
-import com.jo2k.garagify.lendoffer.persistence.model.LendOffer;
-import com.jo2k.garagify.parking.api.ParkingAvailability;
+import com.jo2k.garagify.parking.api.ParkingAvailabilityService;
 import com.jo2k.garagify.parking.api.ParkingService;
 import com.jo2k.garagify.parking.persistence.model.ParkingLend;
 import com.jo2k.garagify.parking.persistence.repository.ParkingLendRepository;
@@ -14,7 +13,7 @@ import java.util.*;
 
 @Service("availabilityLendService")
 @RequiredArgsConstructor
-public class AvailabilityLendServiceImpl implements ParkingAvailability {
+public class AvailabilityLendServiceImpl implements ParkingAvailabilityService {
     private final ParkingLendRepository parkingLendRepository;
     private final ParkingService parkingService;
 

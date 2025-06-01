@@ -54,6 +54,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenDto'
+  /api/v1/parkings/{parking_id}/lend/{spot_id}:
+    post:
+      summary: Borrow a specific parking spot
+      tags:
+        - Lend
+      operationId: createLendForSpot
+      parameters:
+        - name: parking_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: spot_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeRangeRequest'
+      responses:
+        '201':
+          description: Borrow created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LendOfferDTO'
   /api/v1/lend/mine:
     get:
       operationId: getMyLends
@@ -101,6 +132,37 @@ paths:
       responses:
         '204':
           description: Borrow deleted successfully, no content returned
+  /api/v1/parkings/{parking_id}/borrow/{spot_id}:
+    post:
+      summary: Borrow a specific parking spot
+      tags:
+        - Borrow
+      operationId: createBorrowForSpot
+      parameters:
+        - name: parking_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: spot_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeRangeRequest'
+      responses:
+        '201':
+          description: Borrow created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BorrowDTO'
   /api/v1/borrow/mine:
     get:
       operationId: getMyBorrows
@@ -239,37 +301,6 @@ paths:
                 items:
                   type: string
                   format: uuid
-  /api/v1/parkings/{parking_id}/lend/{spot_id}:
-    post:
-      summary: Borrow a specific parking spot
-      tags:
-        - Parking
-      operationId: createLendForSpot
-      parameters:
-        - name: parking_id
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: spot_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TimeRangeRequest'
-      responses:
-        '201':
-          description: Borrow created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LendOfferDTO'
   /api/v1/parkings/{parking_id}/borrow/available-timeranges:
     get:
       tags:
@@ -339,38 +370,6 @@ paths:
                 items:
                   type: string
                   format: uuid
-  /api/v1/parkings/{parking_id}/borrow/{spot_id}:
-    post:
-      summary: Borrow a specific parking spot
-      tags:
-        - Parking
-      operationId: createBorrowForSpot
-      parameters:
-        - name: parking_id
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: spot_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TimeRangeRequest'
-      responses:
-        '201':
-          description: Borrow created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BorrowDTO'
-
   /api/v1/lend-offer:
     post:
       summary: Create a lend offer
@@ -552,9 +551,6 @@ components:
         spot_id:
           description: Id of parking spot
           type: string
-        borrower_id:
-          description: Id of user
-          type: string
         start_date:
           description: Start date of borrow
           type: string
@@ -599,9 +595,6 @@ components:
           type: integer
         spot_id:
           description: Id of parking spot
-          type: string
-        owner_id:
-          description: Id of user
           type: string
     LendOfferPutForm:
       description: This is the lend offer put model

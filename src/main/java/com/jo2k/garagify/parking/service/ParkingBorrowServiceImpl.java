@@ -4,7 +4,7 @@ import com.jo2k.dto.BorrowDTO;
 import com.jo2k.dto.TimeRangeRequest;
 import com.jo2k.garagify.common.exception.InvalidBorrowException;
 import com.jo2k.garagify.common.exception.ObjectNotFoundException;
-import com.jo2k.garagify.parking.api.ParkingBorrowService;
+import com.jo2k.garagify.parking.api.ParkingActionService;
 import com.jo2k.garagify.parking.mapper.ParkingBorrowMapper;
 import com.jo2k.garagify.parking.persistence.model.ParkingBorrow;
 import com.jo2k.garagify.parking.persistence.model.ParkingSpot;
@@ -20,16 +20,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service
+@Service("parkingBorrowService")
 @RequiredArgsConstructor
-public class ParkingBorrowServiceImpl implements ParkingBorrowService {
+public class ParkingBorrowServiceImpl implements ParkingActionService<BorrowDTO> {
     private final ParkingBorrowRepository parkingBorrowRepository;
     private final UserService userService;
     private final ParkingBorrowMapper parkingBorrowMapper;
     private final ParkingSpotRepository parkingSpotRepository;
 
     @Override
-    public BorrowDTO createBorrowForSpot(Integer parkingId, UUID spotUuid, TimeRangeRequest timeRange) {
+    public BorrowDTO create(Integer parkingId, UUID spotUuid, TimeRangeRequest timeRange) {
         User currentUser = userService.getCurrentUser();
 
         ParkingSpot spot = parkingSpotRepository.findByParking_IdAndSpotUuid(parkingId, spotUuid)
@@ -53,14 +53,14 @@ public class ParkingBorrowServiceImpl implements ParkingBorrowService {
     }
 
     @Override
-    public Page<BorrowDTO> getBorrowsForCurrentUser(Pageable pageable) {
+    public Page<BorrowDTO> getForCurrentUser(Pageable pageable) {
         User currentUser = userService.getCurrentUser();
         return parkingBorrowRepository.findAllByUser(currentUser, pageable)
                 .map(parkingBorrowMapper::toDTO);
     }
 
     @Transactional
-    public void deleteBorrowById(UUID id) {
+    public void delete(UUID id) {
         if (!parkingBorrowRepository.existsById(id)) {
             throw new ObjectNotFoundException("Borrow with id " + id + " not found");
         }

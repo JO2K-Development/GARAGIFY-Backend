@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ParkingSpotRepository extends JpaRepository<ParkingSpot, Integer> {
-    boolean existsBySpotUuid(UUID spotUuid);
 
     List<ParkingSpot> findAllByParkingId(Integer parkingId);
 

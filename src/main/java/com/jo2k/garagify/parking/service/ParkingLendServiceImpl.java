@@ -3,7 +3,7 @@ package com.jo2k.garagify.parking.service;
 import com.jo2k.dto.LendOfferDTO;
 import com.jo2k.dto.TimeRangeRequest;
 import com.jo2k.garagify.common.exception.InvalidLendException;
-import com.jo2k.garagify.parking.api.ParkingLendService;
+import com.jo2k.garagify.parking.api.ParkingActionService;
 import com.jo2k.garagify.parking.mapper.ParkingLendMapper;
 import com.jo2k.garagify.parking.persistence.model.ParkingLend;
 import com.jo2k.garagify.parking.persistence.model.ParkingSpot;
@@ -18,9 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service
+@Service("parkingLendService")
 @RequiredArgsConstructor
-public class ParkingLendServiceImpl implements ParkingLendService {
+public class ParkingLendServiceImpl implements ParkingActionService<LendOfferDTO> {
 
     private final ParkingLendRepository parkingLendRepository;
     private final UserService userService;
@@ -28,7 +28,7 @@ public class ParkingLendServiceImpl implements ParkingLendService {
     private final ParkingLendMapper parkingLendMapper;
 
     @Override
-    public LendOfferDTO createLendOfferForSpot(Integer parkingId, UUID spotUuid, TimeRangeRequest timeRange) {
+    public LendOfferDTO create(Integer parkingId, UUID spotUuid, TimeRangeRequest timeRange) {
         User currentUser = userService.getCurrentUser();
 
         ParkingSpot spot = parkingSpotRepository.findByParking_IdAndSpotUuid(parkingId, spotUuid)
@@ -53,14 +53,14 @@ public class ParkingLendServiceImpl implements ParkingLendService {
     }
 
     @Override
-    public Page<LendOfferDTO> getLendsForCurrentUser(Pageable pageable) {
+    public Page<LendOfferDTO> getForCurrentUser(Pageable pageable) {
         User currentUser = userService.getCurrentUser();
         return parkingLendRepository.findAllByOwner(currentUser, pageable)
                 .map(parkingLendMapper::toDTO);
     }
 
     @Override
-    public void deleteLendOfferById(UUID lendOfferId) {
+    public void delete(UUID lendOfferId) {
         if (!parkingLendRepository.existsById(lendOfferId)) {
             throw new InvalidLendException("Lend offer with id " + lendOfferId + " not found");
         }
