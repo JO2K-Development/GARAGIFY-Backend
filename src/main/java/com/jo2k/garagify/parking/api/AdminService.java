@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public interface AdminService {
     void assignSpotToUser(Integer parkingId, UUID spotId, UUID userId);
-    List<UserWithSpotsDTO> getAllUsersWithSpots(Integer parkingId);
 
+    List<UserWithSpotsDTO> getAllUsersWithSpots();
 }

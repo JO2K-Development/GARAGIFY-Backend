@@ -39,7 +39,7 @@ public class AdminController implements AdminApi {
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "size", required = false, defaultValue = "20") Integer size) {
 
-        List<UserWithSpotsDTO> allUsersWithSpots = adminService.getAllUsersWithSpots(parkingId);
+        List<UserWithSpotsDTO> allUsersWithSpots = adminService.getAllUsersWithSpots();
 
         int totalElements = allUsersWithSpots.size();
         int fromIndex = Math.min(page * size, totalElements);
