@@ -1,4 +1,4 @@
-package com.jo2k.garagify.organisation.persistence.persistence.model;
+package com.jo2k.garagify.organisation.persistence.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,5 +16,4 @@ public class Organisation {
     @Column(nullable = false)
     private String name;
 
-    // getters/setters/constructors
 }
