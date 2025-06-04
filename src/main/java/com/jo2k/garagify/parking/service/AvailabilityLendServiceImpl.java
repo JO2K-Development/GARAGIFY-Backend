@@ -5,6 +5,7 @@ import com.jo2k.garagify.parking.api.ParkingAvailabilityService;
 import com.jo2k.garagify.parking.api.ParkingService;
 import com.jo2k.garagify.parking.persistence.model.ParkingLend;
 import com.jo2k.garagify.parking.persistence.repository.ParkingLendRepository;
+import com.jo2k.garagify.user.model.User;
 import com.jo2k.garagify.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class AvailabilityLendServiceImpl implements ParkingAvailabilityService {
     public List<TimeRangeDto> getTimeRanges(Integer parkingId, OffsetDateTime untilWhen) {
         OffsetDateTime now = OffsetDateTime.now();
         UUID userId = userService.getCurrentUser().getId();
-        var spots = parkingService.getParkingSpotsByParkingIdNotOwnedByUser(parkingId, userId);
+        var spots = parkingService.getParkingSpotsByParkingIdForCurrentUser(parkingId, userId);
 
         List<TimeRangeDto> allFree = new ArrayList<>();
 
@@ -38,7 +39,7 @@ public class AvailabilityLendServiceImpl implements ParkingAvailabilityService {
     @Override
     public List<UUID> getSpots(Integer parkingId, OffsetDateTime from, OffsetDateTime until) {
         UUID userId = userService.getCurrentUser().getId();
-        var spots = parkingService.getParkingSpotsByParkingIdNotOwnedByUser(parkingId, userId);
+        var spots = parkingService.getParkingSpotsByParkingIdForCurrentUser(parkingId, userId);
         List<UUID> result = new ArrayList<>();
 
         for (var spot : spots) {
