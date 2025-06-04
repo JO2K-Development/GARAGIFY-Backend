@@ -33,8 +33,8 @@ public class ParkingLendServiceImpl implements ParkingActionService<LendOfferDTO
 
         ParkingSpot spot = parkingSpotRepository.findByParking_IdAndSpotUuid(parkingId, spotUuid)
                 .orElseThrow(() -> new InvalidLendException("Parking spot not found"));
-
-        if (spot.getOwner().getId() == null || !spot.getOwner().getId().equals(currentUser.getId())) {
+        UUID ownerId = spot.getOwner() != null ? spot.getOwner().getId() : null;
+        if (ownerId == null || !spot.getOwner().getId().equals(currentUser.getId())) {
             throw new InvalidLendException("You cannot lend a parking spot you do not own");
         }
 

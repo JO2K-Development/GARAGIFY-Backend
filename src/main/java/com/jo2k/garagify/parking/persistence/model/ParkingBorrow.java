@@ -33,6 +33,10 @@ public class ParkingBorrow {
     @JoinColumn(name = "parking_spot_id", nullable = false)
     private ParkingSpot parkingSpot;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parking_lend_offer_id")
+    private ParkingLend parkingLendOffer;
+
     @Column(name = "created_at", updatable = false, insertable = false)
     private OffsetDateTime createdAt;
 

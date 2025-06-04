@@ -727,8 +727,8 @@ components:
         spot_id:
           description: Id of parking spot
           type: string
-        owner:
-          $ref: '#/components/schemas/UserDTO'
+        borrowers:
+          $ref: '#/components/schemas/UserListDTO'
       required:
         - id
         - start_date
@@ -928,6 +928,16 @@ components:
       required:
         - user_id
         - email
+
+    UserListDTO:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDTO'
+      required:
+        - users
 
     UserWithSpotsDTO:
       type: object
