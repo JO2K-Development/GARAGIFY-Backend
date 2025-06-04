@@ -421,7 +421,7 @@ paths:
     get:
       summary: Get a paginated list of users assigned to parking spots
       tags:
-        - Parking
+        - Admin
       operationId: getAllUsersWithSpots
       parameters:
         - name: parking_id
