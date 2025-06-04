@@ -42,7 +42,7 @@ public class AdminServiceImpl implements AdminService {
 
         Map<UUID, List<ParkingSpot>> spotsByUser = new LinkedHashMap<>();
         for (ParkingSpot spot : parkingSpots) {
-            UUID ownerId = spot.getOwner().getId();
+            UUID ownerId = spot.getOwner() != null ? spot.getOwner().getId() : null;
             if (ownerId != null) {
                 spotsByUser.computeIfAbsent(ownerId, k -> new ArrayList<>()).add(spot);
             }
