@@ -27,7 +27,10 @@ public class AdminController implements AdminApi {
             UUID spotId,
             AssignParkingSpotFormDTO assignParkingSpotRequest
     ) {
-        adminService.assignSpotToUser(parkingId, spotId, assignParkingSpotRequest.getUserId());
+        UUID userId = assignParkingSpotRequest.getUserId() != null
+                ? assignParkingSpotRequest.getUserId().orElse(null)
+                : null;
+        adminService.assignSpotToUser(parkingId, spotId, userId);
         AssignParkingSpot200Response response = new AssignParkingSpot200Response();
         response.setMessage("Parking spot assigned successfully");
         return ResponseEntity.ok(response);
