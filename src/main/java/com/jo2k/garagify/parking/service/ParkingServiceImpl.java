@@ -22,7 +22,6 @@ public class ParkingServiceImpl implements ParkingService {
     private final ParkingSpotRepository parkingSpotRepository;
     private final ParkingMapper parkingMapper;
     private final ParkingSpotMapper parkingSpotMapper;
-    private final UserRepository userRepository;
 
     @Override
     public ParkingDTO getParkingById(Integer parkingId) {
@@ -51,38 +50,4 @@ public class ParkingServiceImpl implements ParkingService {
         );
     }
 
-    @Override
-    public List<UserWithSpotsDTO> getAllUsersWithSpots(Integer parkingId) {
-        if (!parkingRepository.existsById(parkingId)) {
-            throw new ParkingNotFoundException("Parking not found");
-        }
-
-        List<ParkingSpot> parkingSpots = parkingSpotRepository.findAllByParkingId(parkingId);
-
-        Map<UUID, List<ParkingSpot>> spotsByUser = new LinkedHashMap<>();
-        for (ParkingSpot spot : parkingSpots) {
-            UUID ownerId = spot.getOwnerId();
-            if (ownerId != null) {
-                spotsByUser.computeIfAbsent(ownerId, k -> new ArrayList<>()).add(spot);
-            }
-        }
-
-        List<UUID> userIds = new ArrayList<>(spotsByUser.keySet());
-        Map<UUID, String> userEmails = userRepository.findAllById(userIds).stream()
-                .collect(HashMap::new, (map, user) -> map.put(user.getId(), user.getEmail()), HashMap::putAll);
-
-        List<UserWithSpotsDTO> allUsersWithSpots = new ArrayList<>();
-        for (Map.Entry<UUID, List<ParkingSpot>> entry : spotsByUser.entrySet()) {
-            UUID userId = entry.getKey();
-            List<ParkingSpotDTO> spotDTOs = parkingSpotMapper.toList(entry.getValue());
-
-            UserWithSpotsDTO dto = new UserWithSpotsDTO();
-            dto.setUserId(userId);
-            dto.setEmail(userEmails.getOrDefault(userId, "unknown@example.com"));
-            dto.setSpots(spotDTOs);
-            allUsersWithSpots.add(dto);
-        }
-
-        return allUsersWithSpots;
-    }
 }

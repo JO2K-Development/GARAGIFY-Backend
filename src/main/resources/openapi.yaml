@@ -658,7 +658,7 @@ components:
           description: End date of borrow
           type: string
           format: date-time
-        borrower:
+        parking_spot_owner:
           $ref: '#/components/schemas/UserDTO'
 
     BorrowForm:

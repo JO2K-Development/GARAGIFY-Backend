@@ -14,6 +14,6 @@ public interface ParkingBorrowInfoMapper {
     @Mapping(source = "parkingSpot.spotUuid", target = "spotId")
     @Mapping(source = "borrowTime", target = "startDate")
     @Mapping(source = "returnTime", target = "endDate")
-    @Mapping(source = "user", target = "borrower")
+    @Mapping(source = "parkingSpot.owner", target = "parkingSpotOwner")
     BorrowInfoDTO toDTO(ParkingBorrow borrow);
 }

@@ -35,7 +35,7 @@ public class ParkingBorrowServiceImpl implements ParkingActionService<BorrowDTO>
         ParkingSpot spot = parkingSpotRepository.findByParking_IdAndSpotUuid(parkingId, spotUuid)
                 .orElseThrow(() -> new InvalidBorrowException("Parking spot not found"));
 
-        if (spot.getOwnerId() != null && spot.getOwnerId().equals(currentUser.getId())) {
+        if (spot.getOwner().getId() != null && spot.getOwner().getId().equals(currentUser.getId())) {
             throw new InvalidBorrowException("You cannot borrow your own parking spot");
         }
 
