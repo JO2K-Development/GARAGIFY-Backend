@@ -26,19 +26,21 @@ public class AdminServiceImpl implements AdminService {
     public void assignSpotToUser(Integer parkingId, UUID spotId, UUID userId) {
         ParkingSpot spot = parkingSpotRepository.findByParking_IdAndSpotUuid(parkingId, spotId)
                 .orElseThrow(() -> new IllegalArgumentException("Parking spot not found"));
-        spot.setOwner(userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found")));
+        if (userId == null) {
+            spot.setOwner(null);
+        } else {
+            spot.setOwner(userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found")));
+        }
         parkingSpotRepository.save(spot);
     }
 
     @Override
     public List<UserWithSpotsDTO> getAllUsersWithSpots() {
-        // 1. Get all users
         List<User> allUsers = userRepository.findAll();
-        // 2. Get all parking spots
+
         List<ParkingSpot> allSpots = parkingSpotRepository.findAll();
 
-        // 3. Group spots by user ID
         Map<UUID, List<ParkingSpot>> spotsByUser = new HashMap<>();
         for (ParkingSpot spot : allSpots) {
             UUID ownerId = spot.getOwner() != null ? spot.getOwner().getId() : null;
@@ -47,7 +49,6 @@ public class AdminServiceImpl implements AdminService {
             }
         }
 
-        // 4. Build result for all users, including those with no spots
         List<UserWithSpotsDTO> allUsersWithSpots = new ArrayList<>();
         for (User user : allUsers) {
             List<ParkingSpot> userSpots = spotsByUser.getOrDefault(user.getId(), Collections.emptyList());

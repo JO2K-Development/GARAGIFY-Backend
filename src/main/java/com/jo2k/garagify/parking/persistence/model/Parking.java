@@ -1,6 +1,6 @@
 package com.jo2k.garagify.parking.persistence.model;
 
-import com.jo2k.garagify.organisation.persistence.persistence.model.Organisation;
+import com.jo2k.garagify.organisation.persistence.model.Organisation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
