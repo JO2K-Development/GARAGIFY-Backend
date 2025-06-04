@@ -34,6 +34,10 @@ public class ParkingLendServiceImpl implements ParkingActionService<LendOfferDTO
         ParkingSpot spot = parkingSpotRepository.findByParking_IdAndSpotUuid(parkingId, spotUuid)
                 .orElseThrow(() -> new InvalidLendException("Parking spot not found"));
 
+        if (spot.getOwner().getId() == null || !spot.getOwner().getId().equals(currentUser.getId())) {
+            throw new InvalidLendException("You cannot lend a parking spot you do not own");
+        }
+
         boolean overlap = parkingLendRepository.existsByParkingSpot_IdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
                 spot.getId(), timeRange.getUntilWhen(), timeRange.getFromWhen()
         );

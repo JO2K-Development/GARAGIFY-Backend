@@ -1,5 +1,6 @@
 package com.jo2k.garagify.parking.persistence.model;
 
+import com.jo2k.garagify.user.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,8 +23,9 @@ public class ParkingSpot {
     @Column(name = "spot_uuid", nullable = false, columnDefinition = "uuid")
     private UUID spotUuid;
 
-    @Column(name = "owner_id")
-    private UUID ownerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
     @Column(length = 50)
     private String status;

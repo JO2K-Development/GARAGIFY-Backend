@@ -12,6 +12,8 @@ tags:
     description: Borrow a parking spot
   - name: Parking
     description: Parking and spot management
+  - name: Admin
+    description: Operations related to organizations
   - name: LendOfferController
     description: Legacy controller for lend offers
 
@@ -56,7 +58,7 @@ paths:
                 $ref: '#/components/schemas/TokenDto'
   /api/v1/parkings/{parking_id}/lend/{spot_id}:
     post:
-      summary: Borrow a specific parking spot
+      summary: Lend a specific parking spot
       tags:
         - Lend
       operationId: createLendForSpot
@@ -88,7 +90,7 @@ paths:
   /api/v1/lend/mine:
     get:
       operationId: getMyLends
-      summary: Get all borrows for the current user (paged)
+      summary: Get all lends for the current user (paged)
       tags:
         - Lend
       parameters:
@@ -113,12 +115,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LendOfferListDTO'
+                $ref: '#/components/schemas/LendOfferInfoListDTO'
+
   /api/v1/lend/{id}:
     delete:
       tags:
         - Lend
-      summary: Delete a borrow by its ID
+      summary: Delete a lends by its ID
       description: Deletes the lend resource with the given UUID.
       operationId: deleteParkingLend
       parameters:
@@ -191,7 +194,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BorrowListDTO'
+                $ref: '#/components/schemas/BorrowInfoListDTO'
   /api/v1/borrow/{id}:
     delete:
       tags:
@@ -231,6 +234,7 @@ paths:
                 $ref: '#/components/schemas/ParkingDTO'
         404:
           description: Not found
+
   /api/v1/parkings/{parking_id}/lend/available-timeranges:
     get:
       tags:
@@ -301,6 +305,7 @@ paths:
                 items:
                   type: string
                   format: uuid
+
   /api/v1/parkings/{parking_id}/borrow/available-timeranges:
     get:
       tags:
@@ -331,6 +336,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TimeRangeDto'
+
   /api/v1/parkings/{parking_id}/borrow/available-spots:
     get:
       tags:
@@ -370,6 +376,76 @@ paths:
                 items:
                   type: string
                   format: uuid
+
+  /api/v1/admin/parkings/{parking_id}/parking-spots/{spot_id}/assign:
+    put:
+      summary: Assign a parking spot to a user
+      operationId: assignParkingSpot
+      tags:
+        - Admin
+      parameters:
+        - name: parking_id
+          in: path
+          required: true
+          description: Id of the parking
+          schema:
+            type: integer
+        - name: spot_id
+          in: path
+          required: true
+          description: UUID of the parking spot to assign
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignParkingSpotFormDTO'
+      responses:
+        '200':
+          description: Parking spot assigned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Parking spot assigned successfully
+
+  /api/v1/admin/parkings/{parking_id}/users:
+    get:
+      summary: Get a paginated list of users assigned to parking spots
+      tags:
+        - Admin
+      operationId: getAllUsersWithSpots
+      parameters:
+        - name: parking_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Id of the parking
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Page number (0-based)
+        - in: query
+          name: size
+          schema:
+            type: integer
+          description: Page size
+      responses:
+        '200':
+          description: Paginated list of users with assigned parking spots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithSpotsListDTO'
+
   /api/v1/lend-offer:
     post:
       summary: Create a lend offer
@@ -538,6 +614,7 @@ components:
       required:
         - access
         - refresh
+
     BorrowDTO:
       description: This is the borrow model
       type: object
@@ -559,6 +636,31 @@ components:
           description: End date of borrow
           type: string
           format: date-time
+
+    BorrowInfoDTO:
+      description: This is the borrow model
+      type: object
+      properties:
+        id:
+          description: Id of borrow
+          type: string
+        parking_id:
+          description: Id of the parking
+          type: integer
+        spot_id:
+          description: Id of parking spot
+          type: string
+        start_date:
+          description: Start date of borrow
+          type: string
+          format: date-time
+        end_date:
+          description: End date of borrow
+          type: string
+          format: date-time
+        parking_spot_owner:
+          $ref: '#/components/schemas/UserDTO'
+
     BorrowForm:
       type: object
       properties:
@@ -575,6 +677,7 @@ components:
         - spotId
         - startDate
         - endDate
+
     LendOfferDTO:
       description: This is the lend offer model
       type: object
@@ -596,6 +699,44 @@ components:
         spot_id:
           description: Id of parking spot
           type: string
+      required:
+        - id
+        - start_date
+        - end_date
+        - parking_id
+        - spot_id
+
+    LendOfferInfoDTO:
+      description: This is the lend offer model
+      type: object
+      properties:
+        id:
+          description: Id of lend offer
+          type: string
+        start_date:
+          description: Start date of lend offer
+          type: string
+          format: date-time
+        end_date:
+          description: End date of lend offer
+          type: string
+          format: date-time
+        parking_id:
+          description: Id of the parking
+          type: integer
+        spot_id:
+          description: Id of parking spot
+          type: string
+        owner:
+          $ref: '#/components/schemas/UserDTO'
+      required:
+        - id
+        - start_date
+        - end_date
+        - parking_id
+        - spot_id
+        - owner
+
     LendOfferPutForm:
       description: This is the lend offer put model
       type: object
@@ -710,6 +851,17 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/LendOfferDTO'
+
+    LendOfferInfoListDTO:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/LendOfferInfoDTO'
+
     BorrowListDTO:
       allOf:
         - $ref: '#/components/schemas/PagedResponse'
@@ -719,6 +871,17 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/BorrowDTO'
+
+    BorrowInfoListDTO:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/BorrowInfoDTO'
+
     PagedResponse:
       description: Generic paginated response wrapper
       type: object
@@ -753,3 +916,46 @@ components:
         - totalPages
         - page
         - size
+
+    UserDTO:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+      required:
+        - user_id
+        - email
+
+    UserWithSpotsDTO:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/UserDTO'
+        - type: object
+          properties:
+            spots:
+              type: array
+              items:
+                $ref: '#/components/schemas/ParkingSpotDTO'
+          required:
+            - spots
+
+    UserWithSpotsListDTO:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserWithSpotsDTO'
+
+    AssignParkingSpotFormDTO:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: UUID of the user to assign the parking spot to

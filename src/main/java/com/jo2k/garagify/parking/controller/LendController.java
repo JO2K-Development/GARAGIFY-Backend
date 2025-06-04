@@ -1,10 +1,9 @@
 package com.jo2k.garagify.parking.controller;
 
 import com.jo2k.api.LendApi;
-import com.jo2k.dto.LendOfferDTO;
-import com.jo2k.dto.LendOfferListDTO;
-import com.jo2k.dto.TimeRangeRequest;
+import com.jo2k.dto.*;
 import com.jo2k.garagify.parking.api.ParkingActionService;
+import com.jo2k.garagify.parking.api.ParkingInfoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +23,8 @@ import java.util.UUID;
 public class LendController implements LendApi {
 
     private final ParkingActionService<LendOfferDTO> parkingLendService;
+    private final ParkingInfoService<LendOfferInfoDTO> parkingLendOfferInfoService;
+
 
     @Override
     public ResponseEntity<LendOfferDTO> createLendForSpot(
@@ -40,7 +41,7 @@ public class LendController implements LendApi {
     }
 
     @Override
-    public ResponseEntity<LendOfferListDTO> getMyLends(
+    public ResponseEntity<LendOfferInfoListDTO> getMyLends(
             @Valid @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @Valid @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
             @Valid @RequestParam(value = "sort", required = false) String sort
@@ -51,15 +52,15 @@ public class LendController implements LendApi {
 
         Pageable pageable = PageRequest.of(page, size, sortOrder);
 
-        Page<LendOfferDTO> result = parkingLendService.getForCurrentUser(pageable);
+        Page<LendOfferInfoDTO> result = parkingLendOfferInfoService.getForCurrentUser(pageable);
 
-        LendOfferListDTO dto = toDto(result);
+        LendOfferInfoListDTO dto = toDto(result);
 
         return ResponseEntity.ok(dto);
     }
 
-    private static LendOfferListDTO toDto(Page<LendOfferDTO> page) {
-        LendOfferListDTO dto = new LendOfferListDTO();
+    private static LendOfferInfoListDTO toDto(Page<LendOfferInfoDTO> page) {
+        LendOfferInfoListDTO dto = new LendOfferInfoListDTO();
         dto.setContent(page.getContent());
         dto.setTotalElements((long) page.getTotalElements()); // or cast to long if needed
         dto.setTotalPages(page.getTotalPages());

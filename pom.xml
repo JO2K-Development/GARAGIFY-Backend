@@ -193,7 +193,7 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>1.5.5.Final</version>
+            <version>${map-struct.version}</version>
         </dependency>
 
         <!-- MapStruct processor for annotation processing -->
