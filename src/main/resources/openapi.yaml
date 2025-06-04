@@ -374,13 +374,19 @@ paths:
                   type: string
                   format: uuid
 
-  /api/v1/admin/parking-spots/{spot_id}/assign:
+  /api/v1/parkings/{parking_id}/parking-spots/{spot_id}/assign:
     put:
       summary: Assign a parking spot to a user
       operationId: assignParkingSpot
       tags:
-        - Admin
+        - Parking
       parameters:
+        - name: parking_id
+          in: path
+          required: true
+          description: Id of the parking
+          schema:
+            type: integer
         - name: spot_id
           in: path
           required: true
@@ -413,26 +419,32 @@ paths:
                     type: string
                     example: Parking spot assigned successfully
 
-  /api/v1/admin/users:
+  /api/v1/parkings/{parking_id}/users:
     get:
-      summary: Pobierz listę użytkowników z przypisanymi miejscami parkingowymi (paginacja)
+      summary: Get a paginated list of users assigned to parking spots
       tags:
-        - Admin
+        - Parking
       operationId: getAllUsersWithSpots
       parameters:
+        - name: parking_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Id of the parking
         - in: query
           name: page
           schema:
             type: integer
-          description: Numer strony (0-based)
+          description: Page number (0-based)
         - in: query
           name: size
           schema:
             type: integer
-          description: Rozmiar strony
+          description: Page size
       responses:
         '200':
-          description: Lista użytkowników z miejscami parkingowymi (paginowana)
+          description: Paginated list of users with assigned parking spots
           content:
             application/json:
               schema:
