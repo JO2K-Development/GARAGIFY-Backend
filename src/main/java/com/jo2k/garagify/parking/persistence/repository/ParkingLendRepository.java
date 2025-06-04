@@ -9,8 +9,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ParkingLendRepository
@@ -52,4 +54,7 @@ public interface ParkingLendRepository
             OffsetDateTime endDate,
             OffsetDateTime startDate
     );
+
+    Optional<ParkingLend> findFirstByParkingSpot_SpotUuidAndParkingSpot_Parking_IdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+            UUID spotUuid, Integer parkingId, OffsetDateTime startDate, OffsetDateTime endDate);
 }
