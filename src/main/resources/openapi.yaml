@@ -234,6 +234,7 @@ paths:
                 $ref: '#/components/schemas/ParkingDTO'
         404:
           description: Not found
+
   /api/v1/parkings/{parking_id}/lend/available-timeranges:
     get:
       tags:
@@ -304,6 +305,7 @@ paths:
                 items:
                   type: string
                   format: uuid
+
   /api/v1/parkings/{parking_id}/borrow/available-timeranges:
     get:
       tags:
@@ -334,6 +336,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TimeRangeDto'
+
   /api/v1/parkings/{parking_id}/borrow/available-spots:
     get:
       tags:
@@ -399,12 +402,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                user_id:
-                  type: string
-                  format: uuid
-                  description: UUID of the user to assign the parking spot to
+              $ref: '#/components/schemas/AssignParkingSpotFormDTO'
       responses:
         '200':
           description: Parking spot assigned successfully
@@ -953,3 +951,11 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/UserWithSpotsDTO'
+
+    AssignParkingSpotFormDTO:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: UUID of the user to assign the parking spot to
