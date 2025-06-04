@@ -115,7 +115,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LendOfferListDTO'
+                $ref: '#/components/schemas/LendOfferInfoListDTO'
+
   /api/v1/lend/{id}:
     delete:
       tags:
@@ -193,7 +194,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BorrowListDTO'
+                $ref: '#/components/schemas/BorrowInfoListDTO'
   /api/v1/borrow/{id}:
     delete:
       tags:
@@ -605,6 +606,7 @@ components:
       required:
         - access
         - refresh
+
     BorrowDTO:
       description: This is the borrow model
       type: object
@@ -626,6 +628,31 @@ components:
           description: End date of borrow
           type: string
           format: date-time
+
+    BorrowInfoDTO:
+      description: This is the borrow model
+      type: object
+      properties:
+        id:
+          description: Id of borrow
+          type: string
+        parking_id:
+          description: Id of the parking
+          type: integer
+        spot_id:
+          description: Id of parking spot
+          type: string
+        start_date:
+          description: Start date of borrow
+          type: string
+          format: date-time
+        end_date:
+          description: End date of borrow
+          type: string
+          format: date-time
+        borrower:
+          $ref: '#/components/schemas/UserDTO'
+
     BorrowForm:
       type: object
       properties:
@@ -642,6 +669,7 @@ components:
         - spotId
         - startDate
         - endDate
+
     LendOfferDTO:
       description: This is the lend offer model
       type: object
@@ -663,6 +691,44 @@ components:
         spot_id:
           description: Id of parking spot
           type: string
+      required:
+        - id
+        - start_date
+        - end_date
+        - parking_id
+        - spot_id
+
+    LendOfferInfoDTO:
+      description: This is the lend offer model
+      type: object
+      properties:
+        id:
+          description: Id of lend offer
+          type: string
+        start_date:
+          description: Start date of lend offer
+          type: string
+          format: date-time
+        end_date:
+          description: End date of lend offer
+          type: string
+          format: date-time
+        parking_id:
+          description: Id of the parking
+          type: integer
+        spot_id:
+          description: Id of parking spot
+          type: string
+        owner:
+          $ref: '#/components/schemas/UserDTO'
+      required:
+        - id
+        - start_date
+        - end_date
+        - parking_id
+        - spot_id
+        - owner
+
     LendOfferPutForm:
       description: This is the lend offer put model
       type: object
@@ -777,6 +843,17 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/LendOfferDTO'
+
+    LendOfferInfoListDTO:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/LendOfferInfoDTO'
+
     BorrowListDTO:
       allOf:
         - $ref: '#/components/schemas/PagedResponse'
@@ -786,6 +863,17 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/BorrowDTO'
+
+    BorrowInfoListDTO:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/BorrowInfoDTO'
+
     PagedResponse:
       description: Generic paginated response wrapper
       type: object
@@ -821,7 +909,7 @@ components:
         - page
         - size
 
-    UserWithSpotsDTO:
+    UserDTO:
       type: object
       properties:
         user_id:
@@ -829,14 +917,22 @@ components:
           format: uuid
         email:
           type: string
-        spots:
-          type: array
-          items:
-            $ref: '#/components/schemas/ParkingSpotDTO'
       required:
         - user_id
         - email
-        - spots
+
+    UserWithSpotsDTO:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/UserDTO'
+        - type: object
+          properties:
+            spots:
+              type: array
+              items:
+                $ref: '#/components/schemas/ParkingSpotDTO'
+          required:
+            - spots
 
     UserWithSpotsListDTO:
       allOf:
