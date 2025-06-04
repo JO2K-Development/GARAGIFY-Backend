@@ -5,6 +5,7 @@ import com.jo2k.garagify.parking.api.ParkingAvailabilityService;
 import com.jo2k.garagify.parking.api.ParkingService;
 import com.jo2k.garagify.parking.persistence.model.ParkingLend;
 import com.jo2k.garagify.parking.persistence.repository.ParkingLendRepository;
+import com.jo2k.garagify.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +17,13 @@ import java.util.*;
 public class AvailabilityLendServiceImpl implements ParkingAvailabilityService {
     private final ParkingLendRepository parkingLendRepository;
     private final ParkingService parkingService;
+    private final UserService userService;
 
     @Override
     public List<TimeRangeDto> getTimeRanges(Integer parkingId, OffsetDateTime untilWhen) {
         OffsetDateTime now = OffsetDateTime.now();
-        var spots = parkingService.getParkingSpotsByParkingId(parkingId);
+        UUID userId = userService.getCurrentUser().getId();
+        var spots = parkingService.getParkingSpotsByParkingIdNotOwnedByUser(parkingId, userId);
 
         List<TimeRangeDto> allFree = new ArrayList<>();
 
@@ -34,7 +37,8 @@ public class AvailabilityLendServiceImpl implements ParkingAvailabilityService {
 
     @Override
     public List<UUID> getSpots(Integer parkingId, OffsetDateTime from, OffsetDateTime until) {
-        var spots = parkingService.getParkingSpotsByParkingId(parkingId);
+        UUID userId = userService.getCurrentUser().getId();
+        var spots = parkingService.getParkingSpotsByParkingIdNotOwnedByUser(parkingId, userId);
         List<UUID> result = new ArrayList<>();
 
         for (var spot : spots) {
@@ -84,7 +88,7 @@ public class AvailabilityLendServiceImpl implements ParkingAvailabilityService {
         ranges.sort(Comparator.comparing(TimeRangeDto::getStart));
 
         List<TimeRangeDto> merged = new ArrayList<>();
-        TimeRangeDto prev = ranges.get(0);
+        TimeRangeDto prev = ranges.getFirst();
 
         for (int i = 1; i < ranges.size(); i++) {
             TimeRangeDto curr = ranges.get(i);

@@ -35,6 +35,10 @@ public class ParkingBorrowServiceImpl implements ParkingActionService<BorrowDTO>
         ParkingSpot spot = parkingSpotRepository.findByParking_IdAndSpotUuid(parkingId, spotUuid)
                 .orElseThrow(() -> new InvalidBorrowException("Parking spot not found"));
 
+        if (spot.getOwnerId() != null && spot.getOwnerId().equals(currentUser.getId())) {
+            throw new InvalidBorrowException("You cannot borrow your own parking spot");
+        }
+
         boolean overlap = parkingBorrowRepository.existsOverlap(
                 parkingId, spotUuid, timeRange.getFromWhen(), timeRange.getUntilWhen()
         );

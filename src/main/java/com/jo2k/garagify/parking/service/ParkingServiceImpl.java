@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +31,22 @@ public class ParkingServiceImpl implements ParkingService {
     }
 
     @Override
-    public List<ParkingSpotDTO> getParkingSpotsByParkingId(Integer parkingId) {
+    public List<ParkingSpotDTO> getParkingSpotsByParkingIdNotOwnedByUser(Integer parkingId, UUID userId) {
         if (!parkingRepository.existsById(parkingId)) {
             throw new ParkingNotFoundException("Parking not found");
         }
         return parkingSpotMapper.toList(
-                parkingSpotRepository.findAllByParkingId(parkingId)
+                parkingSpotRepository.findAllByParkingIdAndOwnerIdNot(parkingId, userId)
+        );
+    }
+
+    @Override
+    public List<ParkingSpotDTO> getParkingSpotsByParkingIdForCurrentUser(Integer parkingId, UUID userId) {
+        if (!parkingRepository.existsById(parkingId)) {
+            throw new ParkingNotFoundException("Parking not found");
+        }
+        return parkingSpotMapper.toList(
+                parkingSpotRepository.findAllByParkingIdAndOwnerId(parkingId, userId)
         );
     }
 }

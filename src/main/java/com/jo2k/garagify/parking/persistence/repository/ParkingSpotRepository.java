@@ -13,4 +13,8 @@ public interface ParkingSpotRepository extends JpaRepository<ParkingSpot, Intege
 
     Optional<ParkingSpot> findByParking_IdAndSpotUuid(Integer parkingId, UUID spotUuid);
 
+    List<ParkingSpot> findAllByParkingIdAndOwnerIdNot(Integer parkingId, UUID ownerId);
+
+    List<ParkingSpot> findAllByParkingIdAndOwnerId(Integer parkingId, UUID ownerId);
+
 }
