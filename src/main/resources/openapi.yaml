@@ -969,3 +969,6 @@ components:
           type: string
           format: uuid
           description: UUID of the user to assign the parking spot to
+          nullable: true
+      required:
+        - user_id
