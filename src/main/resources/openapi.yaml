@@ -400,8 +400,6 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - user_id
               properties:
                 user_id:
                   type: string
@@ -419,7 +417,7 @@ paths:
                     type: string
                     example: Parking spot assigned successfully
 
-  /api/v1/parkings/{parking_id}/users:
+  /api/v1/admin/parkings/{parking_id}/users:
     get:
       summary: Get a paginated list of users assigned to parking spots
       tags:
