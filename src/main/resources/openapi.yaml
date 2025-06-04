@@ -374,12 +374,12 @@ paths:
                   type: string
                   format: uuid
 
-  /api/v1/parkings/{parking_id}/parking-spots/{spot_id}/assign:
+  /api/v1/admin/parkings/{parking_id}/parking-spots/{spot_id}/assign:
     put:
       summary: Assign a parking spot to a user
       operationId: assignParkingSpot
       tags:
-        - Parking
+        - Admin
       parameters:
         - name: parking_id
           in: path
