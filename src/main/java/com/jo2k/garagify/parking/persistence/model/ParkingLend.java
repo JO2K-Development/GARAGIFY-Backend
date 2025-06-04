@@ -4,6 +4,7 @@ import com.jo2k.garagify.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -37,4 +38,8 @@ public class ParkingLend {
     public void onCreate() {
         this.createdAt = OffsetDateTime.now();
     }
+
+    @OneToMany(mappedBy = "parkingLendOffer")
+    private List<ParkingBorrow> parkingBorrows;
+
 }

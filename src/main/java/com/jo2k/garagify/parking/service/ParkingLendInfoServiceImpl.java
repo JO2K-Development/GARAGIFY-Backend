@@ -34,7 +34,7 @@ public class ParkingLendInfoServiceImpl implements ParkingInfoService<LendOfferI
     public Page<LendOfferInfoDTO> getForCurrentUser(Pageable pageable) {
         User currentUser = userService.getCurrentUser();
         return parkingLendRepository.findAllByOwner(currentUser, pageable)
-                .map(parkingLendInfoMapper::toDTO);
+                .map(parkingLendInfoMapper::toDTOWithBorrowers);
     }
 
 }
