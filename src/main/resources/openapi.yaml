@@ -12,6 +12,8 @@ tags:
     description: Borrow a parking spot
   - name: Parking
     description: Parking and spot management
+  - name: Admin
+    description: Operations related to organizations
   - name: LendOfferController
     description: Legacy controller for lend offers
 
@@ -370,6 +372,71 @@ paths:
                 items:
                   type: string
                   format: uuid
+
+  /api/v1/admin/parking-spots/{spot_id}/assign:
+    put:
+      summary: Assign a parking spot to a user
+      operationId: assignParkingSpot
+      tags:
+        - Admin
+      parameters:
+        - name: spot_id
+          in: path
+          required: true
+          description: UUID of the parking spot to assign
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: UUID of the user to assign the parking spot to
+      responses:
+        '200':
+          description: Parking spot assigned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Parking spot assigned successfully
+
+  /api/v1/admin/users:
+    get:
+      summary: Pobierz listę użytkowników z przypisanymi miejscami parkingowymi (paginacja)
+      tags:
+        - Admin
+      operationId: getAllUsersWithSpots
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Numer strony (0-based)
+        - in: query
+          name: size
+          schema:
+            type: integer
+          description: Rozmiar strony
+      responses:
+        '200':
+          description: Lista użytkowników z miejscami parkingowymi (paginowana)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithSpotsListDTO'
+
   /api/v1/lend-offer:
     post:
       summary: Create a lend offer
@@ -753,3 +820,30 @@ components:
         - totalPages
         - page
         - size
+
+    UserWithSpotsDTO:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        spots:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParkingSpotDTO'
+      required:
+        - user_id
+        - email
+        - spots
+
+    UserWithSpotsListDTO:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserWithSpotsDTO'
