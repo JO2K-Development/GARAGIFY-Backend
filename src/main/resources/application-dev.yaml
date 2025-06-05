@@ -3,6 +3,15 @@ spring:
     url: ${SERVICE_DB_URL}
     username: ${SERVICE_DB_LOGIN}
     password: ${SERVICE_DB_PASSWORD}
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: ${MAIL_SMTP_AUTH}
+      mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS_ENABLE}
+      mail.smtp.from: ${MAIL_SMTP_FROM}
 
 jwt:
   secret: ${JWT_SECRET}

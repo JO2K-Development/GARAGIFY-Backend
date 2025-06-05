@@ -3,6 +3,15 @@ spring:
     url: jdbc:postgresql://localhost:5432/garagify
     username: postgres
     password: postgres
+  mail:
+    host: smtp.example.com
+    port: 2525
+    username: example_user
+    password: example_password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.from: noreply@example.com
 
 jwt:
   secret: 3IUIRg1kXZF9DrfhuBKU0+E8IHL+3yVcGVd0aE4z5y8=

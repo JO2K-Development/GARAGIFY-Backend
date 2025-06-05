@@ -1,0 +1,2 @@
+ALTER TABLE parking_borrows
+    ADD COLUMN reminder_sent BOOLEAN NOT NULL DEFAULT FALSE;

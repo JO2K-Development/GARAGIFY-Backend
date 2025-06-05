@@ -37,6 +37,9 @@ public class ParkingBorrow {
     @JoinColumn(name = "parking_lend_offer_id")
     private ParkingLend parkingLendOffer;
 
+    @Column(name = "reminder_sent", nullable = false)
+    private boolean reminderSent = false;
+
     @Column(name = "created_at", updatable = false, insertable = false)
     private OffsetDateTime createdAt;
 
