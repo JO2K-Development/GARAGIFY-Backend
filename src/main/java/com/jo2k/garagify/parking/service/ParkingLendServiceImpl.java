@@ -38,7 +38,7 @@ public class ParkingLendServiceImpl implements ParkingActionService<LendOfferDTO
             throw new InvalidLendException("You cannot lend a parking spot you do not own");
         }
 
-        boolean overlap = parkingLendRepository.existsByParkingSpot_IdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+        boolean overlap = parkingLendRepository.existsByParkingSpot_IdAndStartDateLessThanAndEndDateGreaterThan(
                 spot.getId(), timeRange.getUntilWhen(), timeRange.getFromWhen()
         );
         if (overlap) {

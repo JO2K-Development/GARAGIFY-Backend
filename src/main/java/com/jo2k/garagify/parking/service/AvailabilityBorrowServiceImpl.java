@@ -5,6 +5,7 @@ import com.jo2k.dto.TimeRangeDto;
 import com.jo2k.garagify.parking.api.ParkingAvailabilityService;
 import com.jo2k.garagify.parking.api.ParkingService;
 import com.jo2k.garagify.parking.mapper.TimeRangeMapper;
+import com.jo2k.garagify.parking.persistence.model.ParkingBorrow;
 import com.jo2k.garagify.parking.persistence.model.ParkingLend;
 import com.jo2k.garagify.parking.persistence.repository.ParkingBorrowRepository;
 import com.jo2k.garagify.parking.persistence.repository.ParkingLendRepository;
@@ -30,17 +31,18 @@ public class AvailabilityBorrowServiceImpl implements ParkingAvailabilityService
     public List<TimeRangeDto> getTimeRanges(Integer parkingId, OffsetDateTime untilWhen) {
         UUID userId = userService.getCurrentUser().getId();
         List<ParkingSpotDTO> spots = parkingService.getParkingSpotsByParkingIdNotOwnedByUser(parkingId, userId);
-        List<TimeRangeDto> result = new ArrayList<>();
+        List<TimeRangeDto> allRanges = new ArrayList<>();
         for (var spot : spots) {
             UUID spotUuid = spot.getSpotUuid();
             List<ParkingLend> offers = getLendOffersUntil(parkingId, spotUuid, untilWhen);
             for (ParkingLend offer : offers) {
-                if (isNotBorrowed(parkingId, spotUuid, offer.getStartDate(), clampEnd(offer.getEndDate(), untilWhen))) {
-                    result.add(timeRangeMapper.toDto(offer.getStartDate(), clampEnd(offer.getEndDate(), untilWhen)));
-                }
+                OffsetDateTime offerStart = offer.getStartDate();
+                OffsetDateTime offerEnd = clampEnd(offer.getEndDate(), untilWhen);
+                List<TimeRangeDto> freeRanges = getFreeRangesForSpot(offer.getId(), offerStart, offerEnd);
+                allRanges.addAll(freeRanges);
             }
         }
-        return mergeTimeRanges(result);
+        return mergeTimeRanges(allRanges);
     }
 
 
@@ -51,11 +53,44 @@ public class AvailabilityBorrowServiceImpl implements ParkingAvailabilityService
         List<UUID> result = new ArrayList<>();
         for (var spot : spots) {
             UUID spotUuid = spot.getSpotUuid();
-            if (hasLendOfferInRange(parkingId, spotUuid, from, until) && isNotBorrowed(parkingId, spotUuid, from, until)) {
+            List<ParkingLend> offers = parkingLendRepository.findByParkingSpot_Parking_IdAndParkingSpot_SpotUuid(parkingId, spotUuid);
+            boolean available = offers.stream().anyMatch(offer ->
+                    !offer.getStartDate().isAfter(from) &&
+                            !offer.getEndDate().isBefore(until) &&
+                            isNotBorrowedForLendOffer(offer.getId(), from, until)
+            );
+            if (available) {
                 result.add(spotUuid);
             }
         }
         return result;
+    }
+
+    private boolean isNotBorrowedForLendOffer(UUID lendOfferId, OffsetDateTime from, OffsetDateTime until) {
+        List<ParkingBorrow> borrows = borrowRepository.findAllByParkingLendOffer_Id(lendOfferId);
+        for (ParkingBorrow borrow : borrows) {
+            if (from.isBefore(borrow.getReturnTime()) && until.isAfter(borrow.getBorrowTime())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private List<TimeRangeDto> getFreeRangesForSpot(UUID lendOfferId, OffsetDateTime offerStart, OffsetDateTime offerEnd) {
+        List<ParkingBorrow> borrows = borrowRepository.findAllByParkingLendOffer_Id(lendOfferId);
+        List<TimeRangeDto> freeRanges = new ArrayList<>();
+        OffsetDateTime current = offerStart;
+        borrows.sort(Comparator.comparing(ParkingBorrow::getBorrowTime));
+        for (ParkingBorrow borrow : borrows) {
+            if (borrow.getBorrowTime().isAfter(current)) {
+                freeRanges.add(new TimeRangeDto(current, borrow.getBorrowTime()));
+            }
+            current = borrow.getReturnTime().isAfter(current) ? borrow.getReturnTime() : current;
+        }
+        if (current.isBefore(offerEnd)) {
+            freeRanges.add(new TimeRangeDto(current, offerEnd));
+        }
+        return freeRanges;
     }
 
 

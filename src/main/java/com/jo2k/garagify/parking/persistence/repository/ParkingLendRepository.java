@@ -49,7 +49,7 @@ public interface ParkingLendRepository
 
     Page<ParkingLend> findAllByOwner(User owner, Pageable pageable);
 
-    boolean existsByParkingSpot_IdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+    boolean existsByParkingSpot_IdAndStartDateLessThanAndEndDateGreaterThan(
             Integer parkingSpotId,
             OffsetDateTime endDate,
             OffsetDateTime startDate
